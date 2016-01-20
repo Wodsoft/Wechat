@@ -33,6 +33,10 @@ namespace Wodsoft.Wechat
 
         public string AppKey { get; private set; }
 
+        /// <summary>
+        /// 检查服务令牌。
+        /// </summary>
+        /// <returns></returns>
         public async Task CheckServiceToken()
         {
             if (ServiceToken.ExpiredDate > DateTime.Now)

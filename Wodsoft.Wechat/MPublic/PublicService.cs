@@ -11,8 +11,19 @@ using System.Xml.Linq;
 
 namespace Wodsoft.Wechat.MPublic
 {
+    /// <summary>
+    /// 公众服务。
+    /// </summary>
     public class PublicService : ServiceBase
     {
+        /// <summary>
+        /// 实例化公众服务。
+        /// </summary>
+        /// <param name="serviceToken">服务令牌。</param>
+        /// <param name="appId">公众号Id。</param>
+        /// <param name="appKey">公众号密钥。</param>
+        /// <param name="appToken">消息令牌。</param>
+        /// <param name="appAESKey">消息AES密钥。</param>
         public PublicService(ServiceToken serviceToken, string appId, string appKey, string appToken, string appAESKey)
             : this(serviceToken, appId, appKey)
         {
@@ -20,16 +31,33 @@ namespace Wodsoft.Wechat.MPublic
             AppAESKey = appAESKey;
         }
 
+        /// <summary>
+        /// 实例化公众服务。
+        /// </summary>
+        /// <param name="serviceToken">服务令牌。</param>
+        /// <param name="appId">公众号Id。</param>
+        /// <param name="appKey">公众号密钥。</param>
         public PublicService(ServiceToken serviceToken, string appId, string appKey)
             : base(serviceToken, appId, appKey)
         {
             MessageManager = new MessageManager();
         }
 
+        /// <summary>
+        /// 获取消息令牌。
+        /// </summary>
         public string AppToken { get; private set; }
 
+        /// <summary>
+        /// 获取消息AES密钥。
+        /// </summary>
         public string AppAESKey { get; private set; }
 
+        /// <summary>
+        /// 处理Json错误。
+        /// </summary>
+        /// <param name="json">Json内容。</param>
+        /// <exception cref="Wodsoft.Wechat.WechatException">微信异常错误。</exception>
         protected void HandleJsonError(string json)
         {
             if (json.Contains("errcode") && !json.Contains("errcode\":0"))
@@ -39,11 +67,25 @@ namespace Wodsoft.Wechat.MPublic
             }
         }
 
+        /// <summary>
+        /// 获取授权地址并且不获取用户信息。
+        /// 该地址不需要用户进行授权。
+        /// </summary>
+        /// <param name="returnUrl">回调地址。</param>
+        /// <param name="state">随机码。</param>
+        /// <returns>返回拼接后的授权地址。</returns>
         public string GetAuthUrlWithoutInfo(string returnUrl, string state)
         {
             return "https://open.weixin.qq.com/connect/oauth2/authorize?appid=" + AppId + "&redirect_uri=" + Uri.EscapeDataString(returnUrl) + "&response_type=code&scope=snsapi_base&state=" + state + "#wechat_redirect";
         }
 
+        /// <summary>
+        /// 获取授权地址并且能进一步获取用户信息。
+        /// 该地址会提示用户进行授权。
+        /// </summary>
+        /// <param name="returnUrl">回调地址。</param>
+        /// <param name="state">随机码。</param>
+        /// <returns>返回拼接后的授权地址。</returns>
         public string GetAuthUrlWithInfo(string returnUrl, string state)
         {
             return "https://open.weixin.qq.com/connect/oauth2/authorize?appid=" + AppId + "&redirect_uri=" + Uri.EscapeDataString(returnUrl) + "&response_type=code&scope=snsapi_userinfo&state=" + state + "#wechat_redirect";
@@ -51,8 +93,16 @@ namespace Wodsoft.Wechat.MPublic
 
         #region 被动消息
 
+        /// <summary>
+        /// 获取或设置消息管理器。
+        /// </summary>
         public MessageManager MessageManager { get; set; }
 
+        /// <summary>
+        /// 处理明文被动消息。
+        /// </summary>
+        /// <param name="stream">消息流。</param>
+        /// <returns>返回回复内容。</returns>
         public virtual async Task<IReplyMessage> HandleMessage(Stream stream)
         {
             if (stream == null)
@@ -63,6 +113,14 @@ namespace Wodsoft.Wechat.MPublic
             return await MessageManager.ExecuteMessage(dictionary);
         }
 
+        /// <summary>
+        /// 处理加密被动消息。
+        /// </summary>
+        /// <param name="stream">消息流。</param>
+        /// <param name="timestamp">时间戳。</param>
+        /// <param name="nonce">随机码。</param>
+        /// <param name="signature">签名。</param>
+        /// <returns>返回回复内容。</returns>
         public virtual async Task<IReplyMessage> HandleEncryptedMessage(Stream stream, string timestamp, string nonce, string signature)
         {
             if (stream == null)
@@ -92,6 +150,11 @@ namespace Wodsoft.Wechat.MPublic
             return await MessageManager.ExecuteMessage(dictionary);
         }
 
+        /// <summary>
+        /// 解密消息。
+        /// </summary>
+        /// <param name="encryptedMessage">加密后的消息。</param>
+        /// <returns>返回解密后的消息。</returns>
         public virtual string DecryptMessage(string encryptedMessage)
         {
             var data = Convert.FromBase64String(encryptedMessage);
@@ -121,6 +184,11 @@ namespace Wodsoft.Wechat.MPublic
             return Encoding.UTF8.GetString(data);
         }
 
+        /// <summary>
+        /// 加密消息。
+        /// </summary>
+        /// <param name="message">消息明文。</param>
+        /// <returns>返回加密后的消息。</returns>
         public virtual string EncryptMessage(string message)
         {
             byte[] key;
@@ -163,8 +231,15 @@ namespace Wodsoft.Wechat.MPublic
 
         #region JSSDK
 
+        /// <summary>
+        /// 获取JS SDK令牌。
+        /// </summary>
         public IServiceToken JavascriptToken { get; private set; }
 
+        /// <summary>
+        /// 刷新JS SDK令牌。
+        /// </summary>
+        /// <returns>返回JS SDK令牌。</returns>
         public virtual async Task<IServiceToken> RefreshJavascriptToken()
         {
             await CheckServiceToken();
@@ -183,16 +258,25 @@ namespace Wodsoft.Wechat.MPublic
             return item;
         }
 
-        public async Task<IServiceToken> GetJavascriptToken()
+        /// <summary>
+        /// 检查JS SDK令牌。
+        /// </summary>
+        /// <returns></returns>
+        public async Task CheckJavascriptToken()
         {
             if (JavascriptToken == null || JavascriptToken.ExpiredDate < DateTime.Now)
                 JavascriptToken = await RefreshJavascriptToken();
-            return JavascriptToken;
         }
 
+        /// <summary>
+        /// 获取JS SDK配置。
+        /// </summary>
+        /// <param name="url">页面地址。</param>
+        /// <returns>返回JS SDK配置。</returns>
         public async Task<IJavascriptConfig> GetJavascriptConfig(string url)
         {
-            var jsToken = (await GetJavascriptToken()).Token;
+            await CheckJavascriptToken();
+            var jsToken = JavascriptToken.Token;
             JavascriptConfig config = new JavascriptConfig();
             config.Nonce = Guid.NewGuid().ToString().Replace("-", "");
             config.TimeStamp = GetTimestamp();
@@ -212,6 +296,11 @@ namespace Wodsoft.Wechat.MPublic
 
         #region 用户
 
+        /// <summary>
+        /// 获取用户令牌。
+        /// </summary>
+        /// <param name="code">用户代码。</param>
+        /// <returns></returns>
         public virtual async Task<IUserToken> GetUserToken(string code)
         {
             string result = await HttpHelper.GetHttp("https://api.weixin.qq.com/sns/oauth2/access_token", new
@@ -224,6 +313,11 @@ namespace Wodsoft.Wechat.MPublic
             return GetUserTokenCore(result);
         }
 
+        /// <summary>
+        /// 刷新用户令牌。
+        /// </summary>
+        /// <param name="userToken">用户令牌。</param>
+        /// <returns>返回新用户令牌。</returns>
         public virtual async Task<IUserToken> RefreshUserToken(IUserToken userToken)
         {
             string result = await HttpHelper.GetHttp("https://api.weixin.qq.com/sns/oauth2/refresh_token", new
@@ -237,6 +331,11 @@ namespace Wodsoft.Wechat.MPublic
             return GetUserTokenCore(result);
         }
 
+        /// <summary>
+        /// 获取用户令牌。
+        /// </summary>
+        /// <param name="json">Json数据。</param>
+        /// <returns>返回用户令牌。</returns>
         protected virtual IUserToken GetUserTokenCore(string json)
         {
             HandleJsonError(json);
@@ -244,6 +343,11 @@ namespace Wodsoft.Wechat.MPublic
             return item;
         }
 
+        /// <summary>
+        /// 获取用户信息。
+        /// </summary>
+        /// <param name="userToken">用户令牌。</param>
+        /// <returns>返回用户信息。</returns>
         public virtual async Task<IUserInfo> GetUserInfo(IUserToken userToken)
         {
             string result = await HttpHelper.GetHttp("https://api.weixin.qq.com/sns/userinfo", new
@@ -256,6 +360,11 @@ namespace Wodsoft.Wechat.MPublic
             return item;
         }
 
+        /// <summary>
+        /// 获取用户信息。
+        /// </summary>
+        /// <param name="openId">用户OpenId。</param>
+        /// <returns>返回用户信息。</returns>
         public virtual async Task<IUserInfo> GetUserInfo(IOpenId openId)
         {
             await CheckServiceToken();
@@ -273,6 +382,12 @@ namespace Wodsoft.Wechat.MPublic
 
         #region 二维码
 
+        /// <summary>
+        /// 创建临时二维码。
+        /// </summary>
+        /// <param name="expired">过期时间（秒）。</param>
+        /// <param name="sceneId">场景Id。</param>
+        /// <returns>返回二维码。</returns>
         public virtual async Task<IQrCode> CreateQrCode(int expired, uint sceneId)
         {
             string jsonData = JsonConvert.SerializeObject(new
@@ -286,6 +401,11 @@ namespace Wodsoft.Wechat.MPublic
             return GetQrCode(result);
         }
 
+        /// <summary>
+        /// 创建永久二维码。
+        /// </summary>
+        /// <param name="sceneId">场景Id。</param>
+        /// <returns>返回二维码。</returns>
         public virtual async Task<IQrCode> CreateQrCode(int sceneId)
         {
             if (sceneId < 1)
@@ -302,6 +422,11 @@ namespace Wodsoft.Wechat.MPublic
             return GetQrCode(result);
         }
 
+        /// <summary>
+        /// 创建永久二维码。
+        /// </summary>
+        /// <param name="scene">场景值。</param>
+        /// <returns>返回二维码。</returns>
         public virtual async Task<IQrCode> CreateQrCode(string scene)
         {
             if (scene == null)
@@ -320,6 +445,11 @@ namespace Wodsoft.Wechat.MPublic
             return GetQrCode(result);
         }
 
+        /// <summary>
+        /// 获取二维码。
+        /// </summary>
+        /// <param name="jsonData">Json数据。</param>
+        /// <returns>返回二维码。</returns>
         protected virtual IQrCode GetQrCode(string jsonData)
         {
             HandleJsonError(jsonData);
@@ -332,6 +462,11 @@ namespace Wodsoft.Wechat.MPublic
             return item;
         }
 
+        /// <summary>
+        /// 获取二维码地址。
+        /// </summary>
+        /// <param name="ticket">二维码标签。</param>
+        /// <returns>返回二维码地址。</returns>
         public virtual string GetQrCodeUrl(string ticket)
         {
             return "https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=" + Uri.EscapeDataString(ticket);
@@ -341,6 +476,13 @@ namespace Wodsoft.Wechat.MPublic
 
         #region 素材
 
+        /// <summary>
+        /// 上传临时素材。
+        /// </summary>
+        /// <param name="stream">内容流。</param>
+        /// <param name="type">素材类型。</param>
+        /// <param name="filename">文件名。</param>
+        /// <returns>返回素材Id。</returns>
         public virtual async Task<string> UploadTemperatureMedia(Stream stream, MediaType type, string filename)
         {
             if (stream == null)
@@ -373,6 +515,11 @@ namespace Wodsoft.Wechat.MPublic
 
         #region 模板消息
 
+        /// <summary>
+        /// 获取模板Id。
+        /// </summary>
+        /// <param name="templateShortId">模板短Id。</param>
+        /// <returns>返回模板Id。</returns>
         public async Task<string> GetTemplateId(string templateShortId)
         {
             byte[] jsonData = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(new
@@ -385,6 +532,11 @@ namespace Wodsoft.Wechat.MPublic
             return JsonConvert.DeserializeXNode(result, "xml").Element("xml").Element("template_id").Value;
         }
 
+        /// <summary>
+        /// 删除模板。
+        /// </summary>
+        /// <param name="templateId">模板Id。</param>
+        /// <returns></returns>
         public async Task RemoveTemplate(string templateId)
         {
             byte[] jsonData = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(new
@@ -396,6 +548,14 @@ namespace Wodsoft.Wechat.MPublic
             HandleJsonError(result);
         }
 
+        /// <summary>
+        /// 发送模板消息。
+        /// </summary>
+        /// <param name="openId">用户OpendId。</param>
+        /// <param name="templateId">模板Id。</param>
+        /// <param name="url">链接地址。</param>
+        /// <param name="parameters">模板参数。</param>
+        /// <returns>返回消息Id。</returns>
         public async Task<string> SendTemplateMessage(IOpenId openId, string templateId, string url, object parameters)
         {
             Dictionary<string, object> parameterData = new Dictionary<string, object>();
