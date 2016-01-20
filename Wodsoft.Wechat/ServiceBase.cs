@@ -10,10 +10,24 @@ using System.Xml.Linq;
 
 namespace Wodsoft.Wechat
 {
+    /// <summary>
+    /// 服务基类。
+    /// </summary>
     public class ServiceBase
     {
+        /// <summary>
+        /// 实例化服务基类。
+        /// </summary>
+        /// <param name="appId">公众号Id。</param>
+        /// <param name="appKey">公众号密钥。</param>
         public ServiceBase(string appId, string appKey) : this(new ServiceToken(), appId, appKey) { }
 
+        /// <summary>
+        /// 实例化服务基类。
+        /// </summary>
+        /// <param name="serviceToken">服务令牌。</param>
+        /// <param name="appId">公众号Id。</param>
+        /// <param name="appKey">公众号密钥。</param>
         public ServiceBase(ServiceToken serviceToken, string appId, string appKey)
         {
             if (serviceToken == null)
@@ -27,10 +41,19 @@ namespace Wodsoft.Wechat
             AppKey = appKey;
         }
 
+        /// <summary>
+        /// 获取服务令牌。
+        /// </summary>
         public ServiceToken ServiceToken { get; private set; }
 
+        /// <summary>
+        /// 获取公众号Id。
+        /// </summary>
         public string AppId { get; private set; }
 
+        /// <summary>
+        /// 获取公众号密钥。
+        /// </summary>
         public string AppKey { get; private set; }
 
         /// <summary>
@@ -72,12 +95,22 @@ namespace Wodsoft.Wechat
                 return string.Concat(md5.ComputeHash(Encoding.UTF8.GetBytes(data)).Select(t => t.ToString("X2")));
         }
 
+        /// <summary>
+        /// 从XML数据转换为字典。
+        /// </summary>
+        /// <param name="xml">XML数据。</param>
+        /// <returns>返回字典。</returns>
         protected virtual IDictionary<string, string> GetDataFromXml(string xml)
         {
             var doc = XDocument.Parse(xml);
             return doc.Element("xml").Elements().ToDictionary(t => t.Name.LocalName, t => t.Value);
         }
 
+        /// <summary>
+        /// 从XML数据转换为字典。
+        /// </summary>
+        /// <param name="stream">XML流。</param>
+        /// <returns>返回字典。</returns>
         protected virtual async Task<IDictionary<string, string>> GetDataFromXml(Stream stream)
         {
             StreamReader reader = new StreamReader(stream);
