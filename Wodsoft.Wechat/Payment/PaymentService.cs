@@ -112,20 +112,20 @@ namespace Wodsoft.Wechat.Payment
         /// <summary>
         /// 微信内置JsAPI支付。
         /// </summary>
-        /// <param name="orderInfo">订单信息。</param>
+        /// <param name="order">订单信息。</param>
         /// <param name="openId">用户OpenId。</param>
         /// <param name="notifyUrl">回调通知地址。</param>
         /// <returns></returns>
-        public virtual async Task<IJsPayment> CreatePayment(IOrderInfo orderInfo, IOpenId openId, string notifyUrl)
+        public virtual async Task<IJsPayment> CreatePayment(IPaymentOrder order, IOpenId openId, string notifyUrl)
         {
-            if (orderInfo == null)
+            if (order == null)
                 throw new ArgumentNullException("order");
             if (openId == null)
                 throw new ArgumentNullException("openId");
             if (notifyUrl == null)
                 throw new ArgumentNullException("notifyUrl");
-            ValidateOrderInfo(orderInfo);
-            var payData = OrderInfoToDictionary(orderInfo);
+            ValidateOrderInfo(order);
+            var payData = OrderInfoToDictionary(order);
             payData.Add("trade_type", "JSAPI");
             payData.Add("openid", openId.OpenId);
             payData.Add("appid", AppId);//公众账号ID
@@ -166,20 +166,20 @@ namespace Wodsoft.Wechat.Payment
         /// <summary>
         /// 微信二维码扫码支付。
         /// </summary>
-        /// <param name="orderInfo">订单信息。</param>
+        /// <param name="order">订单信息。</param>
         /// <param name="productId">商品Id。</param>
         /// <param name="notifyUrl">回调通知地址。</param>
         /// <returns></returns>
-        public virtual async Task<IQrPayment> CreatePayment(IOrderInfo orderInfo, string productId, string notifyUrl)
+        public virtual async Task<IQrPayment> CreatePayment(IPaymentOrder order, string productId, string notifyUrl)
         {
-            if (orderInfo == null)
+            if (order == null)
                 throw new ArgumentNullException("order");
             if (productId == null)
                 throw new ArgumentNullException("productId");
             if (productId.Length > 32)
                 throw new ArgumentOutOfRangeException("productId长度不能大于32。");
-            ValidateOrderInfo(orderInfo);
-            var payData = OrderInfoToDictionary(orderInfo);
+            ValidateOrderInfo(order);
+            var payData = OrderInfoToDictionary(order);
             payData.Add("trade_type", "NATIVE");
             payData.Add("product_id", productId);
             payData.Add("appid", AppId);//公众账号ID
@@ -309,7 +309,7 @@ namespace Wodsoft.Wechat.Payment
         /// </summary>
         /// <param name="refundInfo">退款信息。</param>
         /// <returns></returns>
-        public virtual async Task<IRefundResult> RefundPayment(IRefundInfo refundInfo)
+        public virtual async Task<IRefundResult> RefundPayment(IRefundOrder refundInfo)
         {
             if (refundInfo == null)
                 throw new ArgumentNullException("refundInfo");
@@ -521,7 +521,7 @@ namespace Wodsoft.Wechat.Payment
         /// <summary>
         /// 验证交易信息正确性。
         /// </summary>
-        public virtual void ValidateOrderInfo(IOrderInfo orderInfo)
+        public virtual void ValidateOrderInfo(IPaymentOrder orderInfo)
         {
             if (string.IsNullOrEmpty(orderInfo.Title))
                 throw new Exception("Title不能为空。");
@@ -549,7 +549,7 @@ namespace Wodsoft.Wechat.Payment
                 throw new Exception("Device长度不能大于32。");
         }
 
-        private IDictionary<string, string> OrderInfoToDictionary(IOrderInfo orderInfo)
+        private IDictionary<string, string> OrderInfoToDictionary(IPaymentOrder orderInfo)
         {
             Dictionary<string, string> payData = new Dictionary<string, string>();
             payData.Add("body", orderInfo.Title);
