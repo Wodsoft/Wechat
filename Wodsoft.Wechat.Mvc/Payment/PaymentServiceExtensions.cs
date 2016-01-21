@@ -8,9 +8,18 @@ using System.Web.WebPages;
 
 namespace Wodsoft.Wechat.Payment
 {
+    /// <summary>
+    /// 微信支付服务扩展。
+    /// </summary>
     public static class PaymentServiceExtensions
     {
-        public static async Task<IPaymentInfo> GetNotifyPaymentInfo(this Controller controller, PaymentService service)
+        /// <summary>
+        /// 获取交易信息通知。
+        /// </summary>
+        /// <param name="controller">Mvc控制器。</param>
+        /// <param name="service">微信支付服务。</param>
+        /// <returns>返回交易信息。</returns>
+        public static async Task<IPaymentInfo> GetNotifyPaymentInfo(this  PaymentService service, Controller controller)
         {
             if (controller == null)
                 throw new ArgumentNullException("controller");

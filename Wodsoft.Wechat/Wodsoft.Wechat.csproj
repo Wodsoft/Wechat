@@ -102,11 +102,17 @@
     <Compile Include="MPublic\UserVideoMessage.cs" />
     <Compile Include="MPublic\UserVoiceMessage.cs" />
     <Compile Include="Open\OpenService.cs" />
+    <Compile Include="Payment\Coupon.cs" />
     <Compile Include="Payment\IJsPayment.cs" />
     <Compile Include="Payment\IPaymentOrder.cs" />
     <Compile Include="Payment\IPayment.cs" />
     <Compile Include="Payment\IPaymentInfo.cs" />
     <Compile Include="Payment\IQrPayment.cs" />
+    <Compile Include="Payment\IRefundId.cs" />
+    <Compile Include="Payment\IRefundInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Payment\IRefundNumber.cs" />
     <Compile Include="Payment\IRefundOrder.cs" />
     <Compile Include="Payment\IRefundResult.cs" />
     <Compile Include="Payment\ITradeNumber.cs" />
@@ -116,6 +122,7 @@
     <Compile Include="Payment\PaymentInfo.cs" />
     <Compile Include="Payment\PaymentService.cs" />
     <Compile Include="Payment\QrPayment.cs" />
+    <Compile Include="Payment\RefundInfo.cs" />
     <Compile Include="Payment\RefundResult.cs" />
     <Compile Include="Payment\TradeState.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

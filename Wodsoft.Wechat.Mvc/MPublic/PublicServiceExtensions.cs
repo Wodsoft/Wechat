@@ -10,9 +10,19 @@ using System.Xml;
 
 namespace Wodsoft.Wechat.MPublic
 {
+    /// <summary>
+    /// 微信公众服务扩展。
+    /// </summary>
     public static class PublicServiceExtensions
     {
-        public static ActionResult SignIn(this Controller controller, PublicService service, string returnUrl)
+        /// <summary>
+        /// 微信登录跳转。
+        /// </summary>
+        /// <param name="service">微信公众服务。</param>
+        /// <param name="controller">Mvc控制器。</param>
+        /// <param name="returnUrl">回调地址。</param>
+        /// <returns>返回跳转结果。</returns>
+        public static ActionResult SignIn(this  PublicService service, Controller controller, string returnUrl)
         {
             var state = new Random().Next(100000000, 1000000000);
             controller.Session["wechatState"] = state;
@@ -20,7 +30,13 @@ namespace Wodsoft.Wechat.MPublic
             return new RedirectResult(url);
         }
 
-        public static async Task<ActionResult> HandleMessage(this Controller controller, PublicService service)
+        /// <summary>
+        /// 处理微信被动消息。
+        /// </summary>
+        /// <param name="service">微信公众服务。</param>
+        /// <param name="controller">Mvc控制器。</param>
+        /// <returns>返回处理结果。</returns>
+        public static async Task<ActionResult> HandleMessage(this  PublicService service, Controller controller)
         {
             IReplyMessage message;
             if (controller.Request.QueryString.AllKeys.Contains("msg_signature"))
