@@ -7,7 +7,10 @@ using System.Threading.Tasks;
 
 namespace Wodsoft.Wechat.Payment
 {
-    public interface IOrderInfo : ITradeNumber
+    /// <summary>
+    /// 交易订单。
+    /// </summary>
+    public interface IPaymentOrder : ITradeNumber
     {
         /// <summary>
         /// 获取交易标题。
