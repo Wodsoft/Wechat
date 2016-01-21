@@ -58,25 +58,10 @@ namespace Wodsoft.Wechat.Payment
         public int Coupon { get; set; }
 
         /// <summary>
-        /// 获取优惠券数量。
+        /// 获取或设置优惠券项。
         /// </summary>
-        public int CouponCount { get; set; }
-
-        /// <summary>
-        /// 获取优惠券批次Id。
-        /// </summary>
-        public string[] CouponBatch { get; set; }
-
-        /// <summary>
-        /// 获取优惠券Id。
-        /// </summary>
-        public string[] CouponId { get; set; }
-
-        /// <summary>
-        /// 获取优惠券支付金额。
-        /// </summary>
-        public int[] CouponEach { get; set; }
-
+        public Coupon[] CouponItems { get; set; }
+        
         /// <summary>
         /// 获取微信交易号。
         /// </summary>

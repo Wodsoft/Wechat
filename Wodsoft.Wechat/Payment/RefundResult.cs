@@ -22,29 +22,19 @@ namespace Wodsoft.Wechat.Payment
         public string RefundChannel { get; set; }
 
         /// <summary>
+        /// 获取或设置商户退款单号。
+        /// </summary>
+        public string RefundNo { get; set; }
+
+        /// <summary>
         /// 获取或设置退款金额。
         /// </summary>
         public int RefundFee { get; set; }
 
         /// <summary>
-        /// 获取或设置订单金额。
-        /// </summary>
-        public int TotalFee { get; set; }
-
-        /// <summary>
-        /// 获取或设置货币类型。
-        /// </summary>
-        public string FeeCurrency { get; set; }
-
-        /// <summary>
-        /// 获取或设置现金支付金额。
-        /// </summary>
-        public int Cash { get; set; }
-
-        /// <summary>
         /// 获取或设置现金退款。
         /// </summary>
-        public int CashRefund { get; set; }
+        public int RefundCash { get; set; }
 
         /// <summary>
         /// 获取或设置优惠券退款金额。
@@ -52,13 +42,45 @@ namespace Wodsoft.Wechat.Payment
         public int Coupon { get; set; }
 
         /// <summary>
-        /// 获取或设置优惠券数量。
+        /// 获取或设置优惠券退款项。
         /// </summary>
-        public int CouponCount { get; set; }
+        public Coupon[] CouponItems { get; set; }
 
         /// <summary>
-        /// 获取或设置优惠券Id。
+        /// 获取或设置退款状态。
         /// </summary>
-        public string CouponId { get; set; }
+        public RefundStatus Status { get; set; }
+
+        /// <summary>
+        /// 获取或设置退款账户。
+        /// </summary>
+        public string Account { get; set; }
+    }
+
+    /// <summary>
+    /// 微信退款状态。
+    /// </summary>
+    public enum RefundStatus
+    {
+        /// <summary>
+        /// 成功。
+        /// </summary>
+        SUCCESS,
+        /// <summary>
+        /// 失败。
+        /// </summary>
+        FAIL,
+        /// <summary>
+        /// 处理中。
+        /// </summary>
+        PROCESSING,
+        /// <summary>
+        /// 未确定。（需要商户退款单重新发起退款）
+        /// </summary>
+        NOTSURE,
+        /// <summary>
+        /// 转入代发。
+        /// </summary>
+        CHANGE
     }
 }

@@ -9,13 +9,8 @@ namespace Wodsoft.Wechat.Payment
     /// <summary>
     /// 退款订单。
     /// </summary>
-    public interface IRefundOrder : ITradeNumber, ITransactionId
+    public interface IRefundOrder : ITradeNumber, ITransactionId, IRefundNumber
     {
-        /// <summary>
-        /// 获取商户退款单号。
-        /// </summary>
-        string RefundNo { get; }
-
         /// <summary>
         /// 获取终端设备号。
         /// </summary>
