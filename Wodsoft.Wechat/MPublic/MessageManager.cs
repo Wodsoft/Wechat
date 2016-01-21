@@ -9,29 +9,76 @@ using System.Threading.Tasks;
 
 namespace Wodsoft.Wechat.MPublic
 {
+    /// <summary>
+    /// 消息管理器。
+    /// </summary>
     public class MessageManager
     {
+        /// <summary>
+        /// 订阅时间。
+        /// </summary>
         public event MessageHandler<IUserSubscribeEvent> Subscribe;
+        /// <summary>
+        /// 扫描二维码事件。
+        /// </summary>
         public event MessageHandler<IUserScanEvent> Scan;
+        /// <summary>
+        /// 定位事件。
+        /// </summary>
         public event MessageHandler<IUserLocatedEvent> Locate;
+        /// <summary>
+        /// 点击事件。
+        /// </summary>
         public event MessageHandler<IUserClickEvent> Click;
+        /// <summary>
+        /// 模板发送事件。
+        /// </summary>
         public event MessageHandler<IUserTemplateSendEvent> TemplateSend;
 
+        /// <summary>
+        /// 收到文本事件。
+        /// </summary>
         public event MessageHandler<IUserTextMessage> ReceiveText;
+        /// <summary>
+        /// 收到图片事件。
+        /// </summary>
         public event MessageHandler<IUserImageMessage> ReceiveImage;
+        /// <summary>
+        /// 收到语音事件。
+        /// </summary>
         public event MessageHandler<IUserVoiceMessage> ReceiveVoice;
+        /// <summary>
+        /// 收到视频事件。
+        /// </summary>
         public event MessageHandler<IUserVideoMessage> ReceiveVideo;
+        /// <summary>
+        /// 收到短视频事件。
+        /// </summary>
         public event MessageHandler<IUserShortVideoMessage> ReceiveShortVideo;
+        /// <summary>
+        /// 收到地理位置事件。
+        /// </summary>
         public event MessageHandler<IUserLocationMessage> ReceiveLocation;
+        /// <summary>
+        /// 收到链接事件。
+        /// </summary>
         public event MessageHandler<IUserLinkMessage> ReceiveLink;
 
         private ConcurrentDictionary<int, SemaphoreSlim> _Locker;
 
+        /// <summary>
+        /// 实例化消息管理器。
+        /// </summary>
         public MessageManager()
         {
             _Locker = new ConcurrentDictionary<int, SemaphoreSlim>();
         }
 
+        /// <summary>
+        /// 处理消息。
+        /// </summary>
+        /// <param name="dictionary">消息字典。</param>
+        /// <returns>返回被动回复。</returns>
         public virtual async Task<IReplyMessage> ExecuteMessage(IDictionary<string, string> dictionary)
         {
             string type = dictionary["MsgType"];
@@ -57,14 +104,26 @@ namespace Wodsoft.Wechat.MPublic
             return message;
         }
 
+        /// <summary>
+        /// 默认回复消息。
+        /// </summary>
         public string DefaultReplyMessage { get; set; }
 
+        /// <summary>
+        /// 尝试进入排它锁。
+        /// </summary>
+        /// <param name="hashKey">哈希钥匙。</param>
+        /// <returns>返回是否成功。</returns>
         protected async Task<bool> TryEnterLock(int hashKey)
         {
             SemaphoreSlim locker = _Locker.GetOrAdd(hashKey, new SemaphoreSlim(1));
             return await locker.WaitAsync(0);
         }
 
+        /// <summary>
+        /// 退出排它锁。
+        /// </summary>
+        /// <param name="hashKey">哈希钥匙。</param>
         protected void ExitLock(int hashKey)
         {
             Task.Run(async () =>
@@ -76,6 +135,12 @@ namespace Wodsoft.Wechat.MPublic
             });
         }
 
+        /// <summary>
+        /// 接收事件处理。
+        /// </summary>
+        /// <param name="type">事件类型。</param>
+        /// <param name="dictionary">字典数据。</param>
+        /// <returns>返回被动回复。</returns>
         protected virtual async Task<IReplyMessage> OnReceiveEvent(string type, IDictionary<string, string> dictionary)
         {
             if (!await TryEnterLock(dictionary["FromUserName"].GetHashCode() + dictionary["CreateTime"].GetHashCode()))
@@ -153,6 +218,12 @@ namespace Wodsoft.Wechat.MPublic
             }
         }
 
+        /// <summary>
+        /// 接收消息处理。
+        /// </summary>
+        /// <param name="type">消息类型。</param>
+        /// <param name="dictionary">字典数据。</param>
+        /// <returns>返回被动回复。</returns>
         protected virtual async Task<IReplyMessage> OnReceiveMessage(string type, IDictionary<string, string> dictionary)
         {
             if (!await TryEnterLock(dictionary["MsgId"].GetHashCode()))
@@ -232,11 +303,26 @@ namespace Wodsoft.Wechat.MPublic
         }
     }
 
+    /// <summary>
+    /// 消息处理器。
+    /// </summary>
+    /// <typeparam name="T">消息类型。</typeparam>
+    /// <param name="sender">引发的消息管理器。</param>
+    /// <param name="e">事件参数。</param>
+    /// <returns></returns>
     public delegate Task MessageHandler<T>(MessageManager sender, MessageHandlerEventArgs<T> e) where T : IMessage;
 
+    /// <summary>
+    /// 消息处理事件参数。
+    /// </summary>
+    /// <typeparam name="T">消息类型。</typeparam>
     public class MessageHandlerEventArgs<T>
         where T : IMessage
     {
+        /// <summary>
+        /// 实例化消息处理事件参数。
+        /// </summary>
+        /// <param name="e">事件消息。</param>
         public MessageHandlerEventArgs(T e)
         {
             Event = e;

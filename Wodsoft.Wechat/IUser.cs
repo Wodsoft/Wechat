@@ -6,10 +6,14 @@ using System.Threading.Tasks;
 
 namespace Wodsoft.Wechat
 {
-    public interface IUser : IOpenId
+    /// <summary>
+    /// 用户。
+    /// </summary>
+    public interface IUser : IOpenId, IUnionId
     {
+        /// <summary>
+        /// 获取类型。
+        /// </summary>
         string Scope { get; }
-
-        string UnionId { get; }
     }
 }

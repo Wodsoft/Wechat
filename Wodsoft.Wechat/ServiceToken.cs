@@ -7,17 +7,35 @@ using System.Threading.Tasks;
 
 namespace Wodsoft.Wechat
 {
+    /// <summary>
+    /// 微信服务令牌。
+    /// </summary>
     public class ServiceToken : IServiceToken
     {
+        /// <summary>
+        /// 实例化微信服务令牌。
+        /// </summary>
         public ServiceToken()
         {
             ExpiredDate = DateTime.Now;
         }
 
+        /// <summary>
+        /// 获取或设置过期时间。
+        /// </summary>
         public DateTime ExpiredDate { get; protected set; }
 
+        /// <summary>
+        /// 获取或设置令牌。
+        /// </summary>
         public string Token { get; protected set; }
 
+        /// <summary>
+        /// 刷新令牌。
+        /// </summary>
+        /// <param name="appId">公众号Id。</param>
+        /// <param name="appKey">公众号密钥。</param>
+        /// <returns></returns>
         public virtual async Task RefreshToken(string appId, string appKey)
         {
             string result = await HttpHelper.GetHttp("https://api.weixin.qq.com/cgi-bin/token", new

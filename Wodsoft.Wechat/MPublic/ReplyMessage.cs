@@ -13,11 +13,18 @@ namespace Wodsoft.Wechat.MPublic
     /// </summary>
     public abstract class ReplyMessage : IReplyMessage, IMessage
     {
+        /// <summary>
+        /// 实例化回复消息。
+        /// </summary>
         public ReplyMessage()
         {
             CreateDate = DateTime.Now;
         }
 
+        /// <summary>
+        /// 将消息写入流。
+        /// </summary>
+        /// <param name="stream">流。</param>
         public void WriteResponseText(Stream stream)
         {
             StreamWriter writer = new StreamWriter(stream);
@@ -36,6 +43,10 @@ namespace Wodsoft.Wechat.MPublic
             doc.Save(writer);
         }
 
+        /// <summary>
+        /// 获取回复节点。
+        /// </summary>
+        /// <returns>返回XML Linq节点数组。</returns>
         protected virtual XElement[] GetResponseNode()
         {
             return null;
@@ -56,6 +67,9 @@ namespace Wodsoft.Wechat.MPublic
         /// </summary>
         public DateTime CreateDate { get; protected set; }
 
+        /// <summary>
+        /// 获取或设置消息类型。
+        /// </summary>
         public string Type { get; protected set; }
 
         string IOpenId.OpenId { get { return ToUser; } }

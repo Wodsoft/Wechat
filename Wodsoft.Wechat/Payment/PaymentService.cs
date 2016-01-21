@@ -13,8 +13,19 @@ using Wodsoft.Wechat.MPublic;
 
 namespace Wodsoft.Wechat.Payment
 {
+    /// <summary>
+    /// 微信支付服务。
+    /// </summary>
     public class PaymentService : ServiceBase
     {
+        /// <summary>
+        /// 实例化微信支付服务。
+        /// </summary>
+        /// <param name="serviceToken">微信服务令牌。</param>
+        /// <param name="appId">公众号Id。</param>
+        /// <param name="appKey">公众号密钥。</param>
+        /// <param name="shopId">商户号。</param>
+        /// <param name="shopKey">商户密钥。</param>
         public PaymentService(ServiceToken serviceToken, string appId, string appKey, string shopId, string shopKey)
             : base(serviceToken, appId, appKey)
         {
@@ -26,6 +37,15 @@ namespace Wodsoft.Wechat.Payment
             ShopKey = shopKey;
         }
 
+        /// <summary>
+        /// 实例化微信支付服务。
+        /// </summary>
+        /// <param name="serviceToken">微信服务令牌。</param>
+        /// <param name="appId">公众号Id。</param>
+        /// <param name="appKey">公众号密钥。</param>
+        /// <param name="shopId">商户号。</param>
+        /// <param name="shopKey">商户密钥。</param>
+        /// <param name="cert">客户端证书。</param>
         public PaymentService(ServiceToken serviceToken, string appId, string appKey, string shopId, string shopKey, X509Certificate2 cert)
             : this(serviceToken, appId, appKey, shopId, shopKey)
         {
@@ -35,16 +55,38 @@ namespace Wodsoft.Wechat.Payment
             IsCertificateEnabled = true;
         }
 
+        /// <summary>
+        /// 实例化微信支付服务。
+        /// </summary>
+        /// <param name="serviceToken">微信服务令牌。</param>
+        /// <param name="appId">公众号Id。</param>
+        /// <param name="appKey">公众号密钥。</param>
+        /// <param name="shopId">商户号。</param>
+        /// <param name="shopKey">商户密钥。</param>
+        /// <param name="certPath">客户端证书路径。</param>
+        /// <param name="certPassword">客户端证书密码。</param>
         public PaymentService(ServiceToken serviceToken, string appId, string appKey, string shopId, string shopKey, string certPath, string certPassword)
             : this(serviceToken, appId, appKey, shopId, shopKey, new X509Certificate2(certPath, certPassword))
         { }
 
+        /// <summary>
+        /// 获取商户号。
+        /// </summary>
         public string ShopId { get; private set; }
 
+        /// <summary>
+        /// 获取商户密钥。
+        /// </summary>
         public string ShopKey { get; private set; }
 
+        /// <summary>
+        /// 获取客户端证书。
+        /// </summary>
         public X509Certificate2 Certificate { get; private set; }
 
+        /// <summary>
+        /// 获取是否启用客户端证书。
+        /// </summary>
         public bool IsCertificateEnabled { get; private set; }
 
         /// <summary>
@@ -345,6 +387,9 @@ namespace Wodsoft.Wechat.Payment
         }
 
         private string _NotifySuccess;
+        /// <summary>
+        /// 获取回调成功返回信息。
+        /// </summary>
         public virtual string NofitySuccess
         {
             get
@@ -367,6 +412,9 @@ namespace Wodsoft.Wechat.Payment
         }
 
         private string _NotifyFail;
+        /// <summary>
+        /// 获取回调失败返回信息。
+        /// </summary>
         public virtual string NotifyFail
         {
             get
@@ -388,6 +436,11 @@ namespace Wodsoft.Wechat.Payment
             }
         }
 
+        /// <summary>
+        /// 获取交易信息。
+        /// </summary>
+        /// <param name="root">XML Linq节点。</param>
+        /// <returns>返回交易信息。</returns>
         protected virtual IPaymentInfo GetPaymentInfo(XElement root)
         {
             var dict = root.Elements().ToDictionary(t => t.Name.LocalName, t => t.Value);
@@ -445,6 +498,11 @@ namespace Wodsoft.Wechat.Payment
 
         }
 
+        /// <summary>
+        /// 转换字典数据为XML数据。
+        /// </summary>
+        /// <param name="directory">字典数据。</param>
+        /// <returns>返回XML文本。</returns>
         protected static string GetXml(IDictionary<string, string> directory)
         {
             XmlDocument doc = new XmlDocument();

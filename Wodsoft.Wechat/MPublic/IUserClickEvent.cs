@@ -12,7 +12,7 @@ namespace Wodsoft.Wechat.MPublic
     public interface IUserClickEvent : IUserEvent
     {
         /// <summary>
-        /// 获取事件Key值。
+        /// 获取事件关键字。
         /// </summary>
         string EventKey { get; }
     }

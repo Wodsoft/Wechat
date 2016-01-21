@@ -12,6 +12,9 @@ namespace Wodsoft.Wechat.MPublic
     /// </summary>
     public class ReplyNewsMessage : ReplyMessage
     {
+        /// <summary>
+        /// 实例化回复新闻消息。
+        /// </summary>
         public ReplyNewsMessage()
         {
             Type = "news";
@@ -22,6 +25,10 @@ namespace Wodsoft.Wechat.MPublic
         /// </summary>
         public ReplyNewsItem[] Items { get; set; }
 
+        /// <summary>
+        /// 获取回复节点。
+        /// </summary>
+        /// <returns>返回XML Linq节点数组。</returns>
         protected override XElement[] GetResponseNode()
         {
             if (Items == null)
