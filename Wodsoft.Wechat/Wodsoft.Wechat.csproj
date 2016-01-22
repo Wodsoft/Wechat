@@ -134,7 +134,9 @@
     <Compile Include="WechatException.cs" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="MPublic\README.md" />
     <None Include="packages.config" />
+    <None Include="Payment\README.md" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
