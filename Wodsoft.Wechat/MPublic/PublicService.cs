@@ -584,5 +584,56 @@ namespace Wodsoft.Wechat.MPublic
         }
 
         #endregion
+
+        #region 自定义菜单
+
+        /// <summary>
+        /// 设置微信菜单。
+        /// </summary>
+        /// <param name="menus">菜单项。</param>
+        /// <returns></returns>
+        public async Task SetMenu(Menu[] menus)
+        {
+            if (menus == null)
+                throw new ArgumentNullException("menus");
+            if (menus.Length == 0)
+                throw new ArgumentException("至少需要1个菜单项。");
+            if (menus.Length > 3)
+                throw new ArgumentException("不支持3个以上的菜单项。");
+
+            var data = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(new
+            {
+                button = menus
+            }));
+            await CheckServiceToken();
+            var result = await HttpHelper.PostHttp(new Uri("https://api.weixin.qq.com/cgi-bin/menu/create?access_token=" + ServiceToken.Token), data, "text/json", Encoding.UTF8);
+            HandleJsonError(result);
+        }
+
+        /// <summary>
+        /// 清除微信菜单项。
+        /// </summary>
+        /// <returns></returns>
+        public async Task ClearMenu()
+        {
+            await CheckServiceToken();
+            var result = await HttpHelper.GetHttp("https://api.weixin.qq.com/cgi-bin/menu/delete?access_token=" + ServiceToken.Token);
+            HandleJsonError(result);
+        }
+
+        /// <summary>
+        /// 获取微信菜单项。
+        /// </summary>
+        /// <returns>返回微信菜单项。</returns>
+        public async Task<MenuGeneralItem[]> GetMenu()
+        {
+            await CheckServiceToken();
+            var result = await HttpHelper.GetHttp("https://api.weixin.qq.com/cgi-bin/menu/get?access_token=" + ServiceToken.Token);
+            HandleJsonError(result);
+            var model = JsonConvert.DeserializeObject<MenuQuery>(result);
+            return model.Menu.Items;
+        }
+
+        #endregion
     }
 }
