@@ -611,6 +611,33 @@ namespace Wodsoft.Wechat.MPublic
         }
 
         /// <summary>
+        /// 设置微信匹配菜单。
+        /// </summary>
+        /// <param name="menus">菜单项。</param>
+        /// <param name="rule">匹配规则。</param>
+        /// <returns></returns>
+        public async Task SetMenu(Menu[] menus, MenuRule rule)
+        {
+            if (menus == null)
+                throw new ArgumentNullException("menus");
+            if (menus.Length == 0)
+                throw new ArgumentException("至少需要1个菜单项。");
+            if (menus.Length > 3)
+                throw new ArgumentException("不支持3个以上的菜单项。");
+            if (rule == null)
+                throw new ArgumentNullException("rule");
+
+            var data = Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(new
+            {
+                button = menus,
+                matchrule = rule
+            }));
+            await CheckServiceToken();
+            var result = await HttpHelper.PostHttp(new Uri("https://api.weixin.qq.com/cgi-bin/menu/addconditional?access_token=" + ServiceToken.Token), data, "text/json", Encoding.UTF8);
+            HandleJsonError(result);
+        }
+
+        /// <summary>
         /// 清除微信菜单项。
         /// </summary>
         /// <returns></returns>

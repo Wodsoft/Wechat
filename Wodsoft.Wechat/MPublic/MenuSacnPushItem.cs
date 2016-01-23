@@ -11,6 +11,9 @@ namespace Wodsoft.Wechat.MPublic
     /// </summary>
     public class MenuSacnPushItem : MenuKeyItem
     {
+        /// <summary>
+        /// 获取菜单类型。
+        /// </summary>
         public override string Type
         {
             get { return "scancode_push"; }

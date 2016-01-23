@@ -89,6 +89,7 @@
     <Compile Include="MPublic\Menu.cs" />
     <Compile Include="MPublic\MenuItem.cs" />
     <Compile Include="MPublic\MenuKeyItem.cs" />
+    <Compile Include="MPublic\MenuRule.cs" />
     <Compile Include="MPublic\MenuSacnPushItem.cs" />
     <Compile Include="MPublic\MenuSacnWaitItem.cs" />
     <Compile Include="MPublic\MenuUrlItem.cs" />
