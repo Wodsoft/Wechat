@@ -22,7 +22,7 @@ namespace Wodsoft.Wechat.MPublic
         /// <summary>
         /// 获取或设置匹配的性别。
         /// </summary>
-        [JsonProperty("sex")]
+        [JsonProperty("sex", ItemConverterType = null)]
         public bool? Gender { get; set; }
 
         /// <summary>
@@ -54,6 +54,24 @@ namespace Wodsoft.Wechat.MPublic
         /// </summary>
         [JsonProperty("language")]
         public string Language { get; set; }
+
+        /// <summary>
+        /// 性别转换器。
+        /// </summary>
+        public class GenderConverter : TypeConverter
+        {
+            public override object ConvertTo(ITypeDescriptorContext context, System.Globalization.CultureInfo culture, object value, Type destinationType)
+            {
+                if (value is bool?)
+                {
+                    if (value.Equals(true))
+                        return 1;
+                    else if (value.Equals(false))
+                        return 2;
+                }
+                return null;
+            }
+        }
     }
 
     /// <summary>
