@@ -68,6 +68,11 @@ namespace Wodsoft.Wechat.MPublic
         }
 
         /// <summary>
+        /// 授权地址。
+        /// </summary>
+        public static string AuthorizeUrl = "https://open.weixin.qq.com/connect/oauth2/authorize";
+
+        /// <summary>
         /// 获取授权地址并且不获取用户信息。
         /// 该地址不需要用户进行授权。
         /// </summary>
@@ -76,7 +81,7 @@ namespace Wodsoft.Wechat.MPublic
         /// <returns>返回拼接后的授权地址。</returns>
         public string GetAuthUrlWithoutInfo(string returnUrl, string state)
         {
-            return "https://open.weixin.qq.com/connect/oauth2/authorize?appid=" + AppId + "&redirect_uri=" + Uri.EscapeDataString(returnUrl) + "&response_type=code&scope=snsapi_base&state=" + state + "#wechat_redirect";
+            return AuthorizeUrl + "?appid=" + AppId + "&redirect_uri=" + Uri.EscapeDataString(returnUrl) + "&response_type=code&scope=snsapi_base&state=" + state + "#wechat_redirect";
         }
 
         /// <summary>
@@ -88,7 +93,7 @@ namespace Wodsoft.Wechat.MPublic
         /// <returns>返回拼接后的授权地址。</returns>
         public string GetAuthUrlWithInfo(string returnUrl, string state)
         {
-            return "https://open.weixin.qq.com/connect/oauth2/authorize?appid=" + AppId + "&redirect_uri=" + Uri.EscapeDataString(returnUrl) + "&response_type=code&scope=snsapi_userinfo&state=" + state + "#wechat_redirect";
+            return AuthorizeUrl + "?appid=" + AppId + "&redirect_uri=" + Uri.EscapeDataString(returnUrl) + "&response_type=code&scope=snsapi_userinfo&state=" + state + "#wechat_redirect";
         }
 
         #region 被动消息
@@ -237,6 +242,11 @@ namespace Wodsoft.Wechat.MPublic
         public IServiceToken JavascriptToken { get; private set; }
 
         /// <summary>
+        /// JS SDK令牌地址。
+        /// </summary>
+        public static string JavascriptTokenUrl = "https://api.weixin.qq.com/cgi-bin/ticket/getticket";
+
+        /// <summary>
         /// 刷新JS SDK令牌。
         /// </summary>
         /// <returns>返回JS SDK令牌。</returns>
@@ -244,7 +254,7 @@ namespace Wodsoft.Wechat.MPublic
         {
             await CheckServiceToken();
             string remoteToken = ServiceToken.Token;
-            string result = await HttpHelper.GetHttp("https://api.weixin.qq.com/cgi-bin/ticket/getticket", new
+            string result = await HttpHelper.GetHttp(JavascriptTokenUrl, new
             {
                 access_token = remoteToken,
                 type = "jsapi"
@@ -297,13 +307,18 @@ namespace Wodsoft.Wechat.MPublic
         #region 用户
 
         /// <summary>
+        /// 用户令牌地址。
+        /// </summary>
+        public static string UserTokenUrl = "https://api.weixin.qq.com/sns/oauth2/access_token";
+
+        /// <summary>
         /// 获取用户令牌。
         /// </summary>
         /// <param name="code">用户代码。</param>
         /// <returns></returns>
         public virtual async Task<IUserToken> GetUserToken(string code)
         {
-            string result = await HttpHelper.GetHttp("https://api.weixin.qq.com/sns/oauth2/access_token", new
+            string result = await HttpHelper.GetHttp(UserTokenUrl, new
             {
                 appid = AppId,
                 secret = AppKey,
@@ -314,13 +329,18 @@ namespace Wodsoft.Wechat.MPublic
         }
 
         /// <summary>
+        /// 用户令牌刷新地址。
+        /// </summary>
+        public static string UserTokenRefreshUrl = "https://api.weixin.qq.com/sns/oauth2/refresh_token";
+
+        /// <summary>
         /// 刷新用户令牌。
         /// </summary>
         /// <param name="userToken">用户令牌。</param>
         /// <returns>返回新用户令牌。</returns>
         public virtual async Task<IUserToken> RefreshUserToken(IUserToken userToken)
         {
-            string result = await HttpHelper.GetHttp("https://api.weixin.qq.com/sns/oauth2/refresh_token", new
+            string result = await HttpHelper.GetHttp(UserTokenRefreshUrl, new
             {
                 appid = AppId,
                 grant_type = "refresh_token",
@@ -344,13 +364,18 @@ namespace Wodsoft.Wechat.MPublic
         }
 
         /// <summary>
+        /// 用户信息地址。
+        /// </summary>
+        public static string UserInfoUrl = "https://api.weixin.qq.com/sns/userinfo";
+
+        /// <summary>
         /// 获取用户信息。
         /// </summary>
         /// <param name="userToken">用户令牌。</param>
         /// <returns>返回用户信息。</returns>
         public virtual async Task<IUserInfo> GetUserInfo(IUserToken userToken)
         {
-            string result = await HttpHelper.GetHttp("https://api.weixin.qq.com/sns/userinfo", new
+            string result = await HttpHelper.GetHttp(UserInfoUrl, new
             {
                 access_token = userToken.Token,
                 openid = userToken.OpenId
@@ -368,7 +393,7 @@ namespace Wodsoft.Wechat.MPublic
         public virtual async Task<IUserInfo> GetUserInfo(IOpenId openId)
         {
             await CheckServiceToken();
-            string result = await HttpHelper.GetHttp("https://api.weixin.qq.com/cgi-bin/user/info", new
+            string result = await HttpHelper.GetHttp(UserInfoUrl, new
             {
                 access_token = ServiceToken.Token,
                 openid = openId.OpenId
@@ -381,6 +406,11 @@ namespace Wodsoft.Wechat.MPublic
         #endregion
 
         #region 二维码
+
+        /// <summary>
+        /// 创建二维码地址。
+        /// </summary>
+        public static string CreateQrCodeUrl = "https://api.weixin.qq.com/cgi-bin/qrcode/create";
 
         /// <summary>
         /// 创建临时二维码。
@@ -397,7 +427,7 @@ namespace Wodsoft.Wechat.MPublic
                 action_info = new { scene = new { scene_id = sceneId } }
             });
             await CheckServiceToken();
-            string result = await HttpHelper.PostHttp(new Uri("https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token=" + ServiceToken.Token), Encoding.UTF8.GetBytes(jsonData), "text/json", Encoding.UTF8);
+            string result = await HttpHelper.PostHttp(new Uri(CreateQrCodeUrl + "?access_token=" + ServiceToken.Token), Encoding.UTF8.GetBytes(jsonData), "text/json", Encoding.UTF8);
             return GetQrCode(result);
         }
 
@@ -418,7 +448,7 @@ namespace Wodsoft.Wechat.MPublic
                 action_info = new { scene = new { scene_id = sceneId } }
             });
             await CheckServiceToken();
-            string result = await HttpHelper.PostHttp(new Uri("https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token=" + ServiceToken.Token), Encoding.UTF8.GetBytes(jsonData), "text/json", Encoding.UTF8);
+            string result = await HttpHelper.PostHttp(new Uri(CreateQrCodeUrl + "?access_token=" + ServiceToken.Token), Encoding.UTF8.GetBytes(jsonData), "text/json", Encoding.UTF8);
             return GetQrCode(result);
         }
 
@@ -441,7 +471,7 @@ namespace Wodsoft.Wechat.MPublic
                 action_info = new { scene = new { scene_str = scene } }
             });
             await CheckServiceToken();
-            string result = await HttpHelper.PostHttp(new Uri("https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token=" + ServiceToken.Token), Encoding.UTF8.GetBytes(jsonData), "text/json", Encoding.UTF8);
+            string result = await HttpHelper.PostHttp(new Uri(CreateQrCodeUrl + "?access_token=" + ServiceToken.Token), Encoding.UTF8.GetBytes(jsonData), "text/json", Encoding.UTF8);
             return GetQrCode(result);
         }
 
@@ -463,18 +493,28 @@ namespace Wodsoft.Wechat.MPublic
         }
 
         /// <summary>
+        /// 显示二维码地址。
+        /// </summary>
+        public static string ShowQrCodeUrl = "https://mp.weixin.qq.com/cgi-bin/showqrcode";
+
+        /// <summary>
         /// 获取二维码地址。
         /// </summary>
         /// <param name="ticket">二维码标签。</param>
         /// <returns>返回二维码地址。</returns>
         public virtual string GetQrCodeUrl(string ticket)
         {
-            return "https://mp.weixin.qq.com/cgi-bin/showqrcode?ticket=" + Uri.EscapeDataString(ticket);
+            return ShowQrCodeUrl + "?ticket=" + Uri.EscapeDataString(ticket);
         }
 
         #endregion
 
         #region 素材
+
+        /// <summary>
+        /// 上传临时素材地址。
+        /// </summary>
+        public static string UploadTemperatureMediaUrl = "https://api.weixin.qq.com/cgi-bin/media/upload";
 
         /// <summary>
         /// 上传临时素材。
@@ -506,7 +546,7 @@ namespace Wodsoft.Wechat.MPublic
                         throw new ArgumentException("文件长度超过2M限制。");
                     break;
             }
-            var result = await HttpHelper.PostHttp("https://api.weixin.qq.com/cgi-bin/media/upload?access_token=" + ServiceToken.Token + "&type=" + type.ToString(), new HttpFilePart("media", stream, filename));
+            var result = await HttpHelper.PostHttp(UploadTemperatureMediaUrl + "?access_token=" + ServiceToken.Token + "&type=" + type.ToString(), new HttpFilePart("media", stream, filename));
             HandleJsonError(result);
             return JsonConvert.DeserializeXNode(result, "xml").Element("xml").Element("media_id").Value;
         }
@@ -514,6 +554,11 @@ namespace Wodsoft.Wechat.MPublic
         #endregion
 
         #region 模板消息
+
+        /// <summary>
+        /// 获取模板Id地址。
+        /// </summary>
+        public static string GetTemplateIdUrl = "https://api.weixin.qq.com/cgi-bin/template/api_add_template";
 
         /// <summary>
         /// 获取模板Id。
@@ -527,10 +572,15 @@ namespace Wodsoft.Wechat.MPublic
                 template_id_short = templateShortId
             }));
             await CheckServiceToken();
-            var result = await HttpHelper.PostHttp(new Uri("https://api.weixin.qq.com/cgi-bin/template/api_add_template?access_token=" + ServiceToken.Token), jsonData, "text/json", Encoding.UTF8);
+            var result = await HttpHelper.PostHttp(new Uri(GetTemplateIdUrl + "?access_token=" + ServiceToken.Token), jsonData, "text/json", Encoding.UTF8);
             HandleJsonError(result);
             return JsonConvert.DeserializeXNode(result, "xml").Element("xml").Element("template_id").Value;
         }
+
+        /// <summary>
+        /// 删除模板地址。
+        /// </summary>
+        public static string RemoveTemplateUrl = "https://api,weixin.qq.com/cgi-bin/template/del_private_template";
 
         /// <summary>
         /// 删除模板。
@@ -544,9 +594,14 @@ namespace Wodsoft.Wechat.MPublic
                 template_id = templateId
             }));
             await CheckServiceToken();
-            var result = await HttpHelper.PostHttp(new Uri("https://api,weixin.qq.com/cgi-bin/template/del_private_template?access_token=" + ServiceToken.Token), jsonData, "text/json", Encoding.UTF8);
+            var result = await HttpHelper.PostHttp(new Uri(RemoveTemplateUrl + "?access_token=" + ServiceToken.Token), jsonData, "text/json", Encoding.UTF8);
             HandleJsonError(result);
         }
+
+        /// <summary>
+        /// 发送模板消息地址。
+        /// </summary>
+        public static string SendTemplateMessageUrl = "https://api.weixin.qq.com/cgi-bin/message/template/send";
 
         /// <summary>
         /// 发送模板消息。
@@ -578,7 +633,7 @@ namespace Wodsoft.Wechat.MPublic
                 data = parameterData
             }));
             await CheckServiceToken();
-            var result = await HttpHelper.PostHttp(new Uri("https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=" + ServiceToken.Token), jsonData, "text/json", Encoding.UTF8);
+            var result = await HttpHelper.PostHttp(new Uri(SendTemplateMessageUrl + "?access_token=" + ServiceToken.Token), jsonData, "text/json", Encoding.UTF8);
             HandleJsonError(result);
             return JsonConvert.DeserializeXNode(result, "xml").Element("xml").Element("msgid").Value;
         }

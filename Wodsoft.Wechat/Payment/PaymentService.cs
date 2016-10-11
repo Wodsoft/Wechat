@@ -90,29 +90,34 @@ namespace Wodsoft.Wechat.Payment
         public bool IsCertificateEnabled { get; private set; }
 
         /// <summary>
-        /// 获取创建支付接口地址。
+        /// 创建支付接口地址。
         /// </summary>
-        protected virtual string CreatePayUrl { get { return "https://api.mch.weixin.qq.com/pay/unifiedorder"; } }
+        public static string CreatePayUrl = "https://api.mch.weixin.qq.com/pay/unifiedorder";
 
         /// <summary>
-        /// 获取查询支付接口地址。
+        /// 查询支付接口地址。
         /// </summary>
-        protected virtual string QueryPayUrl { get { return "https://api.mch.weixin.qq.com/pay/orderquery"; } }
+        public static string QueryPayUrl = "https://api.mch.weixin.qq.com/pay/orderquery";
 
         /// <summary>
-        /// 获取关闭支付接口地址。
+        /// 关闭支付接口地址。
         /// </summary>
-        protected virtual string ClosePayUrl { get { return "https://api.mch.weixin.qq.com/pay/closeorder"; } }
+        public static string ClosePayUrl = "https://api.mch.weixin.qq.com/pay/closeorder";
 
         /// <summary>
-        /// 获取退款支付接口地址。
+        /// 退款支付接口地址。
         /// </summary>
-        protected virtual string RefundPayUrl { get { return "https://api.mch.weixin.qq.com/pay/refund"; } }
+        public static string RefundPayUrl = "https://api.mch.weixin.qq.com/pay/refund";
 
         /// <summary>
-        /// 获取退款查询接口地址。
+        /// 退款查询接口地址。
         /// </summary>
-        protected virtual string RefundQueryUrl { get { return "https://api.mch.weixin.qq.com/pay/refundquery"; } }
+        public static string RefundQueryUrl = "https://api.mch.weixin.qq.com/pay/refundquery";
+
+        /// <summary>
+        /// 下载对账单接口地址。
+        /// </summary>
+        public static string DownloadBillUrl = "https://api.mch.weixin.qq.com/pay/downloadbill";
 
         /// <summary>
         /// 微信内置JsAPI支付。
@@ -139,7 +144,7 @@ namespace Wodsoft.Wechat.Payment
             payData.Add("notify_url", notifyUrl);
             payData.Add("sign", GetSignature(payData, ShopKey));
 
-            string backData = await HttpHelper.PostHttp(new Uri(CreatePayUrl), Encoding.UTF8.GetBytes(GetXml(payData)), "text/xml", Encoding.UTF8);
+            string backData = await HttpHelper.PostHttp(new Uri(CreatePayUrl), Encoding.UTF8.GetBytes(GetXml(payData)), "application/x-www-form-urlencoded", Encoding.UTF8);
             XElement root = XDocument.Parse(backData).Element("xml");
             if (root.Element("return_code").Value == "FAIL")
             {
@@ -193,7 +198,7 @@ namespace Wodsoft.Wechat.Payment
             payData.Add("notify_url", notifyUrl);
             payData.Add("sign", GetSignature(payData, ShopKey));
 
-            string backData = await HttpHelper.PostHttp(new Uri(CreatePayUrl), Encoding.UTF8.GetBytes(GetXml(payData)), "text/xml", Encoding.UTF8);
+            string backData = await HttpHelper.PostHttp(new Uri(CreatePayUrl), Encoding.UTF8.GetBytes(GetXml(payData)), "application/x-www-form-urlencoded", Encoding.UTF8);
             XElement root = XDocument.Parse(backData).Element("xml");
             if (root.Element("return_code").Value == "FAIL")
             {
@@ -527,6 +532,31 @@ namespace Wodsoft.Wechat.Payment
                 }
             }
             return info;
+        }
+
+        /// <summary>
+        /// 下载对账单。
+        /// </summary>
+        /// <param name="date">对账日期。</param>
+        /// <returns>返回对账单文本。</returns>
+        public virtual async Task<string> DownloadBill(DateTime date)
+        {
+            var data = new Dictionary<string, string>();
+            data.Add("appid", AppId);//公众账号ID
+            data.Add("mch_id", ShopId);//商户号
+            data.Add("nonce_str", Guid.NewGuid().ToString().Replace("-", ""));//随机字符串
+            data.Add("bill_date", date.ToString("yyyyMMdd"));
+            data.Add("bill_type", "SUCCESS");
+            data.Add("sign", GetSignature(data, ShopKey));
+
+            string backData = await HttpHelper.PostHttp(new Uri(DownloadBillUrl), Encoding.UTF8.GetBytes(GetXml(data)), "application/x-www-form-urlencoded", Encoding.UTF8);
+            if (backData.Contains("return_code"))
+            {
+                XElement root = XDocument.Parse(backData).Element("xml");
+                string errMsg = root.Element("return_msg").Value;
+                throw new WechatException(errMsg);
+            }
+            return backData;
         }
 
         /// <summary>
