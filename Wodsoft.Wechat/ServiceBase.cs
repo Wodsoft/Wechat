@@ -73,7 +73,7 @@ namespace Wodsoft.Wechat
         /// <param name="arguments"></param>
         /// <param name="key"></param>
         /// <returns></returns>
-        protected string GetSignature(object arguments, string key)
+        public string GetSignature(object arguments, string key)
         {
             var type = arguments.GetType();
             Dictionary<string, string> dictionary = new Dictionary<string, string>();
@@ -88,7 +88,7 @@ namespace Wodsoft.Wechat
         /// <param name="dictionary"></param>
         /// <param name="key"></param>
         /// <returns></returns>
-        protected string GetSignature(IDictionary<string, string> dictionary, string key)
+        public string GetSignature(IDictionary<string, string> dictionary, string key)
         {
             string data = string.Join("&", dictionary.Where(t => t.Key != "sign" && !string.IsNullOrEmpty(t.Value)).OrderBy(t => t.Key).Select(t => t.Key + "=" + t.Value)) + "&key=" + key;
             using (MD5 md5 = MD5CryptoServiceProvider.Create())
