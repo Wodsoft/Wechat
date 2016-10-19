@@ -144,7 +144,7 @@ namespace Wodsoft.Wechat.Payment
             payData.Add("notify_url", notifyUrl);
             payData.Add("sign", GetSignature(payData, ShopKey));
 
-            string backData = await HttpHelper.PostHttp(new Uri(CreatePayUrl), Encoding.UTF8.GetBytes(GetXml(payData)), "application/x-www-form-urlencoded", Encoding.UTF8);
+            string backData = await HttpHelper.PostHttp(new Uri(CreatePayUrl), Encoding.UTF8.GetBytes(GetXml(payData)), "text/xml", Encoding.UTF8);
             XElement root = XDocument.Parse(backData).Element("xml");
             if (root.Element("return_code").Value == "FAIL")
             {
@@ -198,7 +198,7 @@ namespace Wodsoft.Wechat.Payment
             payData.Add("notify_url", notifyUrl);
             payData.Add("sign", GetSignature(payData, ShopKey));
 
-            string backData = await HttpHelper.PostHttp(new Uri(CreatePayUrl), Encoding.UTF8.GetBytes(GetXml(payData)), "application/x-www-form-urlencoded", Encoding.UTF8);
+            string backData = await HttpHelper.PostHttp(new Uri(CreatePayUrl), Encoding.UTF8.GetBytes(GetXml(payData)), "text/xml", Encoding.UTF8);
             XElement root = XDocument.Parse(backData).Element("xml");
             if (root.Element("return_code").Value == "FAIL")
             {
