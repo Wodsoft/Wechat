@@ -546,7 +546,7 @@ namespace Wodsoft.Wechat.Payment
             data.Add("mch_id", ShopId);//商户号
             data.Add("nonce_str", Guid.NewGuid().ToString().Replace("-", ""));//随机字符串
             data.Add("bill_date", date.ToString("yyyyMMdd"));
-            data.Add("bill_type", "SUCCESS");
+            data.Add("bill_type", "ALL");
             data.Add("sign", GetSignature(data, ShopKey));
 
             string backData = await HttpHelper.PostHttp(new Uri(DownloadBillUrl), Encoding.UTF8.GetBytes(GetXml(data)), "application/x-www-form-urlencoded", Encoding.UTF8);
