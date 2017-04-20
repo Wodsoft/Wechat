@@ -107,7 +107,7 @@ namespace Wodsoft.Wechat.Payment
         /// <summary>
         /// 退款支付接口地址。
         /// </summary>
-        public static string RefundPayUrl = "https://api.mch.weixin.qq.com/pay/refund";
+        public static string RefundPayUrl = "https://api.mch.weixin.qq.com/secapi/pay/refund";
 
         /// <summary>
         /// 退款查询接口地址。
@@ -333,10 +333,11 @@ namespace Wodsoft.Wechat.Payment
                 payData.Add("transaction_id", refundInfo.TransactionId);
             else
                 payData.Add("out_trade_no", refundInfo.TradeNo);
-            payData.Add("total_fee", refundInfo.RefundNo);
-            payData.Add("refund_fee", refundInfo.TradeNo);
+            payData.Add("total_fee", refundInfo.TotalFee.ToString());
+            payData.Add("refund_fee", refundInfo.RefundFee.ToString());
             if (refundInfo.RefundCurrency != null)
-                payData.Add("refund_fee_type", refundInfo.TradeNo);
+                payData.Add("refund_fee_type", refundInfo.RefundCurrency);
+            payData.Add("out_refund_no", refundInfo.RefundNo);
             payData.Add("op_user_id", refundInfo.Operator ?? ShopId);
             payData.Add("sign", GetSignature(payData, ShopKey));
 
