@@ -678,13 +678,20 @@ namespace Wodsoft.Wechat.Payment
                 info.Coupon = int.Parse(root.Element("coupon_fee").Value);
                 var count = int.Parse(root.Element("coupon_count").Value);
                 info.CouponItems = new Coupon[count];
-                for (int i = 0; i < count; i++)
+                try
                 {
-                    Coupon item = new Coupon();
-                    item.Batch = root.Element("coupon_batch_id_" + i).Value;
-                    item.Id = root.Element("coupon_id_" + i).Value;
-                    item.Fee = int.Parse(root.Element("coupon_fee_" + i).Value);
-                    info.CouponItems[i] = item;
+                    for (int i = 0; i < count; i++)
+                    {
+                        Coupon item = new Coupon();
+                        item.Batch = root.Element("coupon_batch_id_" + i)?.Value;
+                        item.Id = root.Element("coupon_id_" + i)?.Value;
+                        item.Fee = int.Parse(root.Element("coupon_fee_" + i)?.Value);
+                        info.CouponItems[i] = item;
+                    }
+                }
+                catch(Exception ex)
+                {
+
                 }
             }
             if (root.Element("attach") != null)
