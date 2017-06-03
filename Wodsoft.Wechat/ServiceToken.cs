@@ -18,7 +18,10 @@ namespace Wodsoft.Wechat
         public ServiceToken()
         {
             ExpiredDate = DateTime.Now;
+            HttpHelper = new HttpHelper();            
         }
+
+        public HttpHelper HttpHelper { get; private set; }
 
         /// <summary>
         /// 获取或设置过期时间。

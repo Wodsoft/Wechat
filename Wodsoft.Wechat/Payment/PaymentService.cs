@@ -18,6 +18,8 @@ namespace Wodsoft.Wechat.Payment
     /// </summary>
     public class PaymentService : ServiceBase
     {
+        private HttpHelper HttpHelper;
+
         /// <summary>
         /// 实例化微信支付服务。
         /// </summary>
@@ -35,6 +37,9 @@ namespace Wodsoft.Wechat.Payment
                 throw new ArgumentNullException("shopKey");
             ShopId = shopId;
             ShopKey = shopKey;
+            HttpHelper = new HttpHelper();
+            HttpHelper.Client.Timeout = TimeSpan.FromSeconds(5);
+            HttpHelper.Handler.AllowAutoRedirect = true;
         }
 
         /// <summary>
@@ -53,6 +58,7 @@ namespace Wodsoft.Wechat.Payment
                 throw new ArgumentNullException("cert");
             Certificate = cert;
             IsCertificateEnabled = true;
+            HttpHelper.Handler.ClientCertificates.Add(cert);
         }
 
         /// <summary>
@@ -342,7 +348,7 @@ namespace Wodsoft.Wechat.Payment
             payData.Add("sign", GetSignature(payData, ShopKey));
 
 
-            string backData = await HttpHelper.PostHttp(new Uri(RefundPayUrl), Encoding.UTF8.GetBytes(GetXml(payData)), "text/xml", Encoding.UTF8, 5000, Certificate);
+            string backData = await HttpHelper.PostHttp(new Uri(RefundPayUrl), Encoding.UTF8.GetBytes(GetXml(payData)), "text/xml", Encoding.UTF8);
             XElement root = XDocument.Parse(backData).Element("xml");
             if (root.Element("return_code").Value == "FAIL")
             {

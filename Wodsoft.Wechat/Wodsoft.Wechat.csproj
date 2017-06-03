@@ -1,173 +1,31 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup Label="Globals">
+    <SccProjectName>SAK</SccProjectName>
+    <SccProvider>SAK</SccProvider>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccLocalPath>SAK</SccLocalPath>
+  </PropertyGroup>
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{D3F05849-1009-450E-9845-8BEACDB6AEB5}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <TargetFrameworks>netstandard1.4;net451</TargetFrameworks>
     <RootNamespace>Wodsoft.Wechat</RootNamespace>
-    <AssemblyName>Wodsoft.Wechat</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
+    <Description>微信SDK，公众服务，支付服务</Description>
+    <Company>Wodsoft</Company>
+    <Authors>Kation</Authors>
+    <PackageProjectUrl>https://github.com/Wodsoft/Wechat</PackageProjectUrl>
+    <PackageTags>微信 Wechat WeiXin</PackageTags>
+    <Product>Wodsoft Wechat SDK</Product>
+    <Version>1.0.0-beta-1</Version>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Debug\Wodsoft.Wechat.XML</DocumentationFile>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.8.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="System" />
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard1.4'">
+    <PackageReference Include="System.Reflection.TypeExtensions" Version="4.3.0" />
+    <PackageReference Include="System.ComponentModel.Annotations" Version="4.3.0" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'net451'">
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Net.Http.WebRequest" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="HttpHelper.cs" />
-    <Compile Include="IOpenId.cs" />
-    <Compile Include="IServiceToken.cs" />
-    <Compile Include="IToken.cs" />
-    <Compile Include="IUnionId.cs" />
-    <Compile Include="IUser.cs" />
-    <Compile Include="IUserInfo.cs" />
-    <Compile Include="IUserToken.cs" />
-    <Compile Include="MPublic\MediaType.cs" />
-    <Compile Include="MPublic\MenuAlbumItem.cs" />
-    <Compile Include="MPublic\MenuArticleItem.cs" />
-    <Compile Include="MPublic\MenuInfo.cs" />
-    <Compile Include="MPublic\MenuGeneralItem.cs" />
-    <Compile Include="MPublic\MenuImageItem.cs" />
-    <Compile Include="MPublic\MenuQuery.cs" />
-    <Compile Include="MPublic\MenuMapItem.cs" />
-    <Compile Include="MPublic\MenuMediaItem.cs" />
-    <Compile Include="MPublic\MenuPhotoItem.cs" />
-    <Compile Include="MPublic\IJavascriptConfig.cs" />
-    <Compile Include="MPublic\IMessage.cs" />
-    <Compile Include="MPublic\IQrCode.cs" />
-    <Compile Include="MPublic\IReplyMessage.cs" />
-    <Compile Include="MPublic\IUserClickEvent.cs" />
-    <Compile Include="MPublic\IUserEvent.cs" />
-    <Compile Include="MPublic\IUserImageMessage.cs" />
-    <Compile Include="MPublic\IUserLinkMessage.cs" />
-    <Compile Include="MPublic\IUserLocatedEvent.cs" />
-    <Compile Include="MPublic\IUserLocationMessage.cs" />
-    <Compile Include="MPublic\IUserMediaMessage.cs" />
-    <Compile Include="MPublic\IUserMessage.cs" />
-    <Compile Include="MPublic\IUserScanEvent.cs" />
-    <Compile Include="MPublic\IUserShortVideoMessage.cs" />
-    <Compile Include="MPublic\IUserSubscribeEvent.cs" />
-    <Compile Include="MPublic\IUserTemplateSendEvent.cs" />
-    <Compile Include="MPublic\IUserTextMessage.cs" />
-    <Compile Include="MPublic\IUserVideoMessage.cs" />
-    <Compile Include="MPublic\IUserVoiceMessage.cs" />
-    <Compile Include="MPublic\JavascriptConfig.cs" />
-    <Compile Include="MPublic\JavascriptToken.cs" />
-    <Compile Include="MPublic\MenuClickItem.cs" />
-    <Compile Include="MPublic\MenuCollection.cs" />
-    <Compile Include="MPublic\Menu.cs" />
-    <Compile Include="MPublic\MenuItem.cs" />
-    <Compile Include="MPublic\MenuKeyItem.cs" />
-    <Compile Include="MPublic\MenuRule.cs" />
-    <Compile Include="MPublic\MenuSacnPushItem.cs" />
-    <Compile Include="MPublic\MenuSacnWaitItem.cs" />
-    <Compile Include="MPublic\MenuUrlItem.cs" />
-    <Compile Include="MPublic\Message.cs" />
-    <Compile Include="MPublic\MessageManager.cs" />
-    <Compile Include="MPublic\PublicService.cs" />
-    <Compile Include="MPublic\QrCode.cs" />
-    <Compile Include="MPublic\ReplyEmptyMessage.cs" />
-    <Compile Include="MPublic\ReplyErrorMessage.cs" />
-    <Compile Include="MPublic\ReplyMessage.cs" />
-    <Compile Include="MPublic\ReplyNewsItem.cs" />
-    <Compile Include="MPublic\ReplyNewsMessage.cs" />
-    <Compile Include="MPublic\ReplyTextMessage.cs" />
-    <Compile Include="MPublic\UnknownMessageException.cs" />
-    <Compile Include="MPublic\UserClickEvent.cs" />
-    <Compile Include="MPublic\UserEvent.cs" />
-    <Compile Include="MPublic\UserImageMessage.cs" />
-    <Compile Include="MPublic\UserLinkMessage.cs" />
-    <Compile Include="MPublic\UserLocatedEvent.cs" />
-    <Compile Include="MPublic\UserLocationMessage.cs" />
-    <Compile Include="MPublic\UserMediaMessage.cs" />
-    <Compile Include="MPublic\UserMessage.cs" />
-    <Compile Include="MPublic\UserScanEvent.cs" />
-    <Compile Include="MPublic\UserShortVideoMessage.cs" />
-    <Compile Include="MPublic\UserSubscribeEvent.cs" />
-    <Compile Include="MPublic\UserTemplateSendEvent.cs" />
-    <Compile Include="MPublic\UserTextMessage.cs" />
-    <Compile Include="MPublic\UserVideoMessage.cs" />
-    <Compile Include="MPublic\UserVoiceMessage.cs" />
-    <Compile Include="Open\OpenService.cs" />
-    <Compile Include="Payment\Coupon.cs" />
-    <Compile Include="Payment\IJsPayment.cs" />
-    <Compile Include="Payment\IPaymentOrder.cs" />
-    <Compile Include="Payment\IPayment.cs" />
-    <Compile Include="Payment\IPaymentInfo.cs" />
-    <Compile Include="Payment\IQrPayment.cs" />
-    <Compile Include="Payment\IRefundId.cs" />
-    <Compile Include="Payment\IRefundInfo.cs">
-      <SubType>Code</SubType>
-    </Compile>
-    <Compile Include="Payment\IRefundNumber.cs" />
-    <Compile Include="Payment\IRefundOrder.cs" />
-    <Compile Include="Payment\IRefundResult.cs" />
-    <Compile Include="Payment\ITradeNumber.cs" />
-    <Compile Include="Payment\ITransactionId.cs" />
-    <Compile Include="Payment\JsPayment.cs" />
-    <Compile Include="Payment\PaymentBase.cs" />
-    <Compile Include="Payment\PaymentInfo.cs" />
-    <Compile Include="Payment\PaymentService.cs" />
-    <Compile Include="Payment\QrPayment.cs" />
-    <Compile Include="Payment\RefundInfo.cs" />
-    <Compile Include="Payment\RefundResult.cs" />
-    <Compile Include="Payment\TradeState.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ServiceBase.cs" />
-    <Compile Include="ServiceError.cs" />
-    <Compile Include="ServiceToken.cs" />
-    <Compile Include="UserInfo.cs" />
-    <Compile Include="UserToken.cs" />
-    <Compile Include="WechatException.cs" />
+    <PackageReference Include="Newtonsoft.Json" Version="10.0.2" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="MPublic\README.md" />
-    <None Include="packages.config" />
-    <None Include="Payment\README.md" />
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
-  <PropertyGroup>
-    <PostBuildEvent>if not exist "$(SolutionDir)Bin" md "$(SolutionDir)Bin"
-copy "$(TargetPath)" "$(SolutionDir)Bin"
-copy "$(TargetDir)$(TargetName).pdb" "$(SolutionDir)Bin"
-copy "$(TargetDir)$(TargetName).xml" "$(SolutionDir)Bin"</PostBuildEvent>
-  </PropertyGroup>
-  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
-       Other similar extension points exist, see Microsoft.Common.targets.
-  <Target Name="BeforeBuild">
-  </Target>
-  <Target Name="AfterBuild">
-  </Target>
-  -->
 </Project>

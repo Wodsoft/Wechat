@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -41,7 +42,10 @@ namespace Wodsoft.Wechat.MPublic
             : base(serviceToken, appId, appKey)
         {
             MessageManager = new MessageManager();
+            HttpHelper = new HttpHelper();
         }
+
+        public HttpHelper HttpHelper { get; private set; }
 
         /// <summary>
         /// 获取消息令牌。
@@ -169,7 +173,7 @@ namespace Wodsoft.Wechat.MPublic
             byte[] iv = new byte[16];
             Array.Copy(key, iv, 16);
 
-            RijndaelManaged aes = new RijndaelManaged();
+            Aes aes = Aes.Create();
             aes.KeySize = 256;
             aes.BlockSize = 128;
             aes.Mode = CipherMode.CBC;
@@ -219,7 +223,7 @@ namespace Wodsoft.Wechat.MPublic
                 pad = 32;
             data.AddRange(Encoding.UTF8.GetBytes("".PadLeft(pad, (char)(byte)(pad & 0xFF))));
 
-            var aes = new RijndaelManaged();
+            var aes = Aes.Create();
             aes.KeySize = 256;
             aes.BlockSize = 128;
             aes.Padding = PaddingMode.None;
@@ -614,7 +618,7 @@ namespace Wodsoft.Wechat.MPublic
         public async Task<string> SendTemplateMessage(IOpenId openId, string templateId, string url, object parameters)
         {
             Dictionary<string, object> parameterData = new Dictionary<string, object>();
-            foreach (var p in parameters.GetType().GetProperties())
+            foreach (var p in parameters.GetType().GetRuntimeProperties())
             {
                 object value = p.GetValue(parameters);
                 if (value is string)

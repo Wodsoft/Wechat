@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -77,7 +78,7 @@ namespace Wodsoft.Wechat
         {
             var type = arguments.GetType();
             Dictionary<string, string> dictionary = new Dictionary<string, string>();
-            foreach (var property in type.GetProperties())
+            foreach (var property in type.GetRuntimeProperties())
                 dictionary.Add(property.Name, property.GetValue(arguments).ToString());
             return GetSignature(dictionary, key);
         }
@@ -91,7 +92,7 @@ namespace Wodsoft.Wechat
         public string GetSignature(IDictionary<string, string> dictionary, string key)
         {
             string data = string.Join("&", dictionary.Where(t => t.Key != "sign" && !string.IsNullOrEmpty(t.Value)).OrderBy(t => t.Key).Select(t => t.Key + "=" + t.Value)) + "&key=" + key;
-            using (MD5 md5 = MD5CryptoServiceProvider.Create())
+            using (MD5 md5 = MD5.Create())
                 return string.Concat(md5.ComputeHash(Encoding.UTF8.GetBytes(data)).Select(t => t.ToString("X2")));
         }
 

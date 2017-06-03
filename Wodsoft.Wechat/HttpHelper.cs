@@ -3,17 +3,37 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Net.Http;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
+using System.Reflection;
 
 namespace Wodsoft.Wechat
 {
     /// <summary>
     /// Http助手。
     /// </summary>
-    public static class HttpHelper
+    public class HttpHelper
     {
+        public HttpHelper()
+        {
+#if NET451
+            Handler = new WebRequestHandler();
+#else
+        Handler = new HttpClientHandler();
+#endif
+            Client = new HttpClient(Handler);
+        }
+
+        public HttpClient Client { get; private set; }
+
+#if NET451
+        public WebRequestHandler Handler { get; private set; }
+#else
+        public HttpClientHandler Handler { get; private set; }
+#endif
+
         /// <summary>
         /// Get获取内容。
         /// </summary>
@@ -21,14 +41,15 @@ namespace Wodsoft.Wechat
         /// <param name="encoding">编码</param>
         /// <param name="timeout">超时（毫秒）。</param>
         /// <returns>返回响应内容。</returns>
-        public static async Task<string> GetHttp(Uri uri, Encoding encoding, int timeout)
+        public async Task<string> GetHttp(Uri uri, Encoding encoding, int timeout)
         {
-            HttpWebRequest request = HttpWebRequest.CreateHttp(uri);
-            request.Timeout = timeout;
-            request.Method = "GET";
-            request.AllowAutoRedirect = true;
-            var response = await request.GetResponseAsync();
-            var stream = response.GetResponseStream();
+            var response = await Client.GetAsync(uri);
+            //HttpWebRequest request = HttpWebRequest.CreateHttp(uri);
+            //request.Timeout = timeout;
+            //request.Method = "GET";
+            //request.AllowAutoRedirect = true;
+            //var response = await request.GetResponseAsync();
+            var stream = await response.Content.ReadAsStreamAsync();
             StreamReader reader = new StreamReader(stream, encoding);
             string result = await reader.ReadToEndAsync();
             return result;
@@ -40,7 +61,7 @@ namespace Wodsoft.Wechat
         /// <param name="uri">地址。</param>
         /// <param name="encoding">编码。</param>
         /// <returns>返回响应内容。</returns>
-        public static Task<string> GetHttp(Uri uri, Encoding encoding)
+        public Task<string> GetHttp(Uri uri, Encoding encoding)
         {
             return GetHttp(uri, encoding, 5000);
         }
@@ -51,7 +72,7 @@ namespace Wodsoft.Wechat
         /// <param name="uri">地址。</param>
         /// <param name="timeout">超时（毫秒）。</param>
         /// <returns>返回响应内容。</returns>
-        public static Task<string> GetHttp(Uri uri, int timeout)
+        public Task<string> GetHttp(Uri uri, int timeout)
         {
             return GetHttp(uri, Encoding.UTF8, timeout);
         }
@@ -61,7 +82,7 @@ namespace Wodsoft.Wechat
         /// </summary>
         /// <param name="uri">地址。</param>
         /// <returns>返回响应内容。</returns>
-        public static Task<string> GetHttp(Uri uri)
+        public Task<string> GetHttp(Uri uri)
         {
             return GetHttp(uri, Encoding.UTF8, 5000);
         }
@@ -71,7 +92,7 @@ namespace Wodsoft.Wechat
         /// </summary>
         /// <param name="url">地址。</param>
         /// <returns>返回响应内容。</returns>
-        public static Task<string> GetHttp(string url)
+        public Task<string> GetHttp(string url)
         {
             return GetHttp(new Uri(url));
         }
@@ -82,11 +103,11 @@ namespace Wodsoft.Wechat
         /// <param name="url">地址。</param>
         /// <param name="querystring"></param>
         /// <returns>返回响应内容。</returns>
-        public static Task<string> GetHttp(string url, object querystring)
+        public Task<string> GetHttp(string url, object querystring)
         {
             var type = querystring.GetType();
             Dictionary<string, string> data = new Dictionary<string, string>();
-            foreach (var property in type.GetProperties())
+            foreach (var property in type.GetRuntimeProperties())
             {
                 data.Add(property.Name, property.GetValue(querystring).ToString());
             }
@@ -101,46 +122,27 @@ namespace Wodsoft.Wechat
         /// <param name="rawData">原始数据。</param>
         /// <param name="contentType">内容类型。</param>
         /// <param name="encoding">编码。</param>
-        /// <param name="timeout">超时（毫秒）。</param>
-        /// <param name="cert">客户端证书。</param>
         /// <returns>返回响应内容。</returns>
-        public static async Task<string> PostHttp(Uri uri, byte[] rawData, string contentType, Encoding encoding, int timeout, X509Certificate2 cert)
+        public async Task<string> PostHttp(Uri uri, byte[] rawData, string contentType, Encoding encoding)
         {
-            HttpWebRequest request = HttpWebRequest.CreateHttp(uri);
-            request.Timeout = timeout;
-            request.Method = "POST";
-            request.ContentType = contentType;
-            request.ContentLength = rawData.Length;
-            if (cert != null)
-                request.ClientCertificates.Add(cert);
-            request.AllowAutoRedirect = true;
+            ByteArrayContent content = new ByteArrayContent(rawData);
+            content.Headers.Add("Content-Type", contentType);
+            var response = await Client.PostAsync(uri, content);
+            //HttpWebRequest request = HttpWebRequest.CreateHttp(uri);
+            //request.Timeout = timeout;
+            //request.Method = "POST";
+            //request.ContentType = contentType;
+            //request.ContentLength = rawData.Length;
+            //if (cert != null)
+            //    request.ClientCertificates.Add(cert);
+            //request.AllowAutoRedirect = true;
             {
-                var stream = await request.GetRequestStreamAsync();
-                await stream.WriteAsync(rawData, 0, rawData.Length);
-                stream.Close();
-            }
-            {
-                var response = await request.GetResponseAsync();
-                var stream = response.GetResponseStream();
+                var stream = await response.Content.ReadAsStreamAsync();
                 StreamReader reader = new StreamReader(stream, encoding);
                 string result = await reader.ReadToEndAsync();
                 return result;
             }
         }
-
-        /// <summary>
-        /// Post提交数据。
-        /// </summary>
-        /// <param name="uri">地址。</param>
-        /// <param name="rawData">原始数据。</param>
-        /// <param name="contentType">内容类型。</param>
-        /// <param name="encoding">编码。</param>
-        /// <returns>返回响应内容。</returns>
-        public static Task<string> PostHttp(Uri uri, byte[] rawData, string contentType, Encoding encoding)
-        {
-            return PostHttp(uri, rawData, contentType, encoding, 5000, null);
-        }
-
         /// <summary>
         /// Post提交数据。
         /// </summary>
@@ -148,7 +150,7 @@ namespace Wodsoft.Wechat
         /// <param name="formData">表单数据。</param>
         /// <param name="encoding">编码。</param>
         /// <returns>返回响应内容。</returns>
-        public static Task<string> PostHttp(Uri uri, object formData, Encoding encoding)
+        public Task<string> PostHttp(Uri uri, object formData, Encoding encoding)
         {
             var type = formData.GetType();
             Dictionary<string, string> data = new Dictionary<string, string>();
@@ -165,7 +167,7 @@ namespace Wodsoft.Wechat
         /// <param name="uri">地址。</param>
         /// <param name="formData">表单数据。</param>
         /// <returns>返回响应内容。</returns>
-        public static Task<string> PostHttp(Uri uri, object formData)
+        public Task<string> PostHttp(Uri uri, object formData)
         {
             return PostHttp(uri, formData, Encoding.UTF8);
         }
@@ -177,7 +179,7 @@ namespace Wodsoft.Wechat
         /// <param name="formData"></param>
         /// <param name="encoding">编码。</param>
         /// <returns>返回响应内容。</returns>
-        public static Task<string> PostHttp(Uri uri, IDictionary<string, string> formData, Encoding encoding)
+        public Task<string> PostHttp(Uri uri, IDictionary<string, string> formData, Encoding encoding)
         {
             return PostHttp(uri, encoding.GetBytes(GetFormString(formData)), "application/x-www-form-urlencoded", encoding);
         }
@@ -188,7 +190,7 @@ namespace Wodsoft.Wechat
         /// <param name="uri">地址。</param>
         /// <param name="formData">表单数据。</param>
         /// <returns>返回响应内容。</returns>
-        public static Task<string> PostHttp(Uri uri, IDictionary<string, string> formData)
+        public Task<string> PostHttp(Uri uri, IDictionary<string, string> formData)
         {
             return PostHttp(uri, formData, Encoding.UTF8);
         }
@@ -199,7 +201,7 @@ namespace Wodsoft.Wechat
         /// <param name="url">地址。</param>
         /// <param name="formData"></param>
         /// <returns>返回响应内容。</returns>
-        public static Task<string> PostHttp(string url, object formData)
+        public Task<string> PostHttp(string url, object formData)
         {
             return PostHttp(new Uri(url), formData);
         }
@@ -210,7 +212,7 @@ namespace Wodsoft.Wechat
         /// <param name="url">地址。</param>
         /// <param name="formData">表单数据。</param>
         /// <returns>返回响应内容。</returns>
-        public static Task<string> PostHttp(string url, IDictionary<string, string> formData)
+        public Task<string> PostHttp(string url, IDictionary<string, string> formData)
         {
             return PostHttp(new Uri(url), formData);
         }
@@ -219,63 +221,35 @@ namespace Wodsoft.Wechat
         /// Post提交文件。
         /// </summary>
         /// <param name="uri">地址。</param>
-        /// <param name="timeout">超时（毫秒）。</param>
-        /// <param name="cert">客户端证书。</param>
         /// <param name="parts">内容部分。</param>
         /// <returns>返回响应内容。</returns>
-        public static async Task<string> PostHttp(Uri uri, int timeout, X509Certificate2 cert, params HttpPart[] parts)
+        public async Task<string> PostHttp(Uri uri, params HttpPart[] parts)
         {
-            var boundary = "--" + Guid.NewGuid().ToString();
-            var startBoundary = Encoding.UTF8.GetBytes("--" + boundary);
-            var endBoundary = Encoding.UTF8.GetBytes("--" + boundary + "--");
-
-            HttpWebRequest request = HttpWebRequest.CreateHttp(uri);
-            request.Timeout = timeout;
-            request.Method = "POST";
-            request.ContentType = "multipart/form-data; boundary=" + boundary;
-            if (cert != null)
-                request.ClientCertificates.Add(cert);
-            request.AllowAutoRedirect = true;
+            MultipartFormDataContent content = new MultipartFormDataContent();
+            foreach (var part in parts)
             {
-                var stream = await request.GetRequestStreamAsync();
-                foreach (var part in parts)
-                {
-                    await stream.WriteAsync(startBoundary, 0, startBoundary.Length);
-                    await part.WriteContent(stream);
-                }
-                await stream.WriteAsync(endBoundary, 0, endBoundary.Length);
-                stream.Close();
+                MemoryStream stream = new MemoryStream();
+                await part.WriteContent(stream);
+                content.Add(new ByteArrayContent(stream.ToArray()), part.Name);
             }
+            var response = await Client.PostAsync(uri, content);
             {
-                var response = await request.GetResponseAsync();
-                var stream = response.GetResponseStream();
+                var stream = await response.Content.ReadAsStreamAsync();
                 StreamReader reader = new StreamReader(stream, Encoding.UTF8);
                 string result = await reader.ReadToEndAsync();
                 return result;
             }
         }
-
-        /// <summary>
-        /// Post提交文件。
-        /// </summary>
-        /// <param name="url">地址。</param>
-        /// <param name="timeout">超时（毫秒）。</param>
-        /// <param name="parts">内容部分。</param>
-        /// <returns>返回响应内容。</returns>
-        public static Task<string> PostHttp(string url, int timeout, params HttpPart[] parts)
-        {
-            return PostHttp(new Uri(url), timeout, null, parts);
-        }
-
+        
         /// <summary>
         /// 
         /// </summary>
         /// <param name="url">地址。</param>
         /// <param name="parts"></param>
         /// <returns>返回响应内容。</returns>
-        public static Task<string> PostHttp(string url, params HttpPart[] parts)
+        public Task<string> PostHttp(string url, params HttpPart[] parts)
         {
-            return PostHttp(new Uri(url), 10000, null, parts);
+            return PostHttp(new Uri(url), parts);
         }
 
         /// <summary>
@@ -283,7 +257,7 @@ namespace Wodsoft.Wechat
         /// </summary>
         /// <param name="dictionary">字典数据。</param>
         /// <returns>返回查询字符串。</returns>
-        public static string GetQueryString(IDictionary<string, string> dictionary)
+        public string GetQueryString(IDictionary<string, string> dictionary)
         {
             return string.Join("&", dictionary.Select(t => t.Key + "=" + Uri.EscapeUriString(t.Value)));
         }
@@ -293,7 +267,7 @@ namespace Wodsoft.Wechat
         /// </summary>
         /// <param name="dictionary">字典数据。</param>
         /// <returns>返回表单字符串。</returns>
-        public static string GetFormString(IDictionary<string, string> dictionary)
+        public string GetFormString(IDictionary<string, string> dictionary)
         {
             return string.Join("&", dictionary.Select(t => t.Key + "=" + Uri.EscapeDataString(t.Value)));
         }
@@ -307,7 +281,7 @@ namespace Wodsoft.Wechat
         /// <summary>
         /// 获取新行字节数据。
         /// </summary>
-        protected static readonly byte[] NewLine = Encoding.UTF8.GetBytes("\r\n");
+        protected readonly byte[] NewLine = Encoding.UTF8.GetBytes("\r\n");
 
         /// <summary>
         /// 实例化Http部分。
