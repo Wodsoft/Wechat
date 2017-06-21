@@ -14,7 +14,7 @@
     <PackageProjectUrl>https://github.com/Wodsoft/Wechat</PackageProjectUrl>
     <PackageTags>微信 Wechat WeiXin</PackageTags>
     <Product>Wodsoft Wechat SDK</Product>
-    <Version>1.0.0-beta-1</Version>
+    <Version>1.0.0-beta-2</Version>
   </PropertyGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard1.4'">
     <PackageReference Include="System.Reflection.TypeExtensions" Version="4.3.0" />

@@ -224,6 +224,55 @@ namespace Wodsoft.Wechat.Payment
         }
 
         /// <summary>
+        /// 微信APP支付。
+        /// </summary>
+        /// <param name="order">订单信息。</param>
+        /// <param name="productId">商品Id。</param>
+        /// <param name="notifyUrl">回调通知地址。</param>
+        /// <returns></returns>
+        public virtual async Task<IAppPayment> CreatePayment(IPaymentOrder order, string notifyUrl)
+        {
+            if (order == null)
+                throw new ArgumentNullException("order");
+            ValidateOrderInfo(order);
+            var payData = OrderInfoToDictionary(order);
+            payData.Add("trade_type", "APP");
+            payData.Add("appid", AppId);//公众账号ID
+            payData.Add("mch_id", ShopId);//商户号
+            payData.Add("nonce_str", Guid.NewGuid().ToString().Replace("-", ""));//随机字符串
+            payData.Add("notify_url", notifyUrl);
+            payData.Add("sign", GetSignature(payData, ShopKey));
+
+            string backData = await HttpHelper.PostHttp(new Uri(CreatePayUrl), Encoding.UTF8.GetBytes(GetXml(payData)), "text/xml", Encoding.UTF8);
+            XElement root = XDocument.Parse(backData).Element("xml");
+            if (root.Element("return_code").Value == "FAIL")
+            {
+                string errMsg = root.Element("return_msg").Value;
+                throw new WechatException(errMsg);
+            }
+            if (root.Element("result_code").Value == "FAIL")
+            {
+                string errMsg = root.Element("err_code").Value;
+                throw new WechatException(errMsg);
+            }
+            AppPayment payment = new AppPayment();
+            payment.PrepayId = root.Element("prepay_id").Value;
+            payment.TradeType = root.Element("trade_type").Value;
+            payment.TimeStamp = GetTimestamp();
+            payment.Nonce = Guid.NewGuid().ToString().Replace("-", "");
+            payment.Signature = GetSignature(new
+            {
+                appId = AppId,
+                timeStamp = payment.TimeStamp,
+                nonceStr = payment.Nonce,
+                partnerid = AppId,
+                prepayid = payment.PrepayId,
+                package = "Sign=WXPay"
+            }, ShopKey);
+            return payment;
+        }
+
+        /// <summary>
         /// 获取微信交易信息。
         /// </summary>
         /// <param name="tradeNo">商户订单号。</param>
@@ -695,7 +744,7 @@ namespace Wodsoft.Wechat.Payment
                         info.CouponItems[i] = item;
                     }
                 }
-                catch(Exception ex)
+                catch (Exception ex)
                 {
 
                 }
