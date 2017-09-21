@@ -262,8 +262,8 @@ namespace Wodsoft.Wechat.Payment
             payment.Signature = GetSignature(new
             {
                 appId = AppId,
-                timeStamp = payment.TimeStamp,
-                nonceStr = payment.Nonce,
+                timestamp = payment.TimeStamp,
+                noncestr = payment.Nonce,
                 partnerid = ShopId,
                 prepayid = payment.PrepayId,
                 package = "Sign=WXPay"
