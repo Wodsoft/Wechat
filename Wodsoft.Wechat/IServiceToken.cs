@@ -15,5 +15,11 @@ namespace Wodsoft.Wechat
         /// 获取过期时间。
         /// </summary>
         DateTime ExpiredDate { get; }
+
+        /// <summary>
+        /// 刷新令牌。
+        /// </summary>
+        /// <returns></returns>
+        Task RefreshTokenAsync();
     }
 }

@@ -21,7 +21,7 @@ namespace Wodsoft.Wechat
         /// </summary>
         /// <param name="appId">公众号Id。</param>
         /// <param name="appKey">公众号密钥。</param>
-        public ServiceBase(string appId, string appKey) : this(new ServiceToken(), appId, appKey) { }
+        public ServiceBase(string appId, string appKey) : this(new ServiceToken(appId, appKey), appId, appKey) { }
 
         /// <summary>
         /// 实例化服务基类。
@@ -29,7 +29,7 @@ namespace Wodsoft.Wechat
         /// <param name="serviceToken">服务令牌。</param>
         /// <param name="appId">公众号Id。</param>
         /// <param name="appKey">公众号密钥。</param>
-        public ServiceBase(ServiceToken serviceToken, string appId, string appKey)
+        public ServiceBase(IServiceToken serviceToken, string appId, string appKey)
         {
             if (serviceToken == null)
                 throw new ArgumentNullException("serviceToken");
@@ -45,7 +45,7 @@ namespace Wodsoft.Wechat
         /// <summary>
         /// 获取服务令牌。
         /// </summary>
-        public ServiceToken ServiceToken { get; private set; }
+        public IServiceToken ServiceToken { get; private set; }
 
         /// <summary>
         /// 获取公众号Id。
@@ -65,7 +65,7 @@ namespace Wodsoft.Wechat
         {
             if (ServiceToken.ExpiredDate > DateTime.Now)
                 return;
-            await ServiceToken.RefreshToken(AppId, AppKey);
+            await ServiceToken.RefreshTokenAsync();
         }
 
         /// <summary>

@@ -28,7 +28,7 @@ namespace Wodsoft.Wechat.Payment
         /// <param name="appKey">公众号密钥。</param>
         /// <param name="shopId">商户号。</param>
         /// <param name="shopKey">商户密钥。</param>
-        public PaymentService(ServiceToken serviceToken, string appId, string appKey, string shopId, string shopKey)
+        public PaymentService(IServiceToken serviceToken, string appId, string appKey, string shopId, string shopKey)
             : base(serviceToken, appId, appKey)
         {
             if (shopId == null)
@@ -51,7 +51,7 @@ namespace Wodsoft.Wechat.Payment
         /// <param name="shopId">商户号。</param>
         /// <param name="shopKey">商户密钥。</param>
         /// <param name="cert">客户端证书。</param>
-        public PaymentService(ServiceToken serviceToken, string appId, string appKey, string shopId, string shopKey, X509Certificate2 cert)
+        public PaymentService(IServiceToken serviceToken, string appId, string appKey, string shopId, string shopKey, X509Certificate2 cert)
             : this(serviceToken, appId, appKey, shopId, shopKey)
         {
             if (cert == null)
@@ -71,7 +71,7 @@ namespace Wodsoft.Wechat.Payment
         /// <param name="shopKey">商户密钥。</param>
         /// <param name="certPath">客户端证书路径。</param>
         /// <param name="certPassword">客户端证书密码。</param>
-        public PaymentService(ServiceToken serviceToken, string appId, string appKey, string shopId, string shopKey, string certPath, string certPassword)
+        public PaymentService(IServiceToken serviceToken, string appId, string appKey, string shopId, string shopKey, string certPath, string certPassword)
             : this(serviceToken, appId, appKey, shopId, shopKey, new X509Certificate2(certPath, certPassword))
         { }
 

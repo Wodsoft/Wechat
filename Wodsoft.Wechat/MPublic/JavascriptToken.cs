@@ -20,5 +20,14 @@ namespace Wodsoft.Wechat.MPublic
         /// 获取令牌。
         /// </summary>
         public string Token { get; set; }
+
+        /// <summary>
+        /// 刷新令牌。
+        /// </summary>
+        /// <returns></returns>
+        public Task RefreshTokenAsync()
+        {
+            throw new NotSupportedException();
+        }
     }
 }

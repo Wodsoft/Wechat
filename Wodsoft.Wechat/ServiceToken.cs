@@ -12,14 +12,29 @@ namespace Wodsoft.Wechat
     /// </summary>
     public class ServiceToken : IServiceToken
     {
+        public static string TokenUrl = "https://api.weixin.qq.com/cgi-bin/token";
+
         /// <summary>
         /// 实例化微信服务令牌。
         /// </summary>
-        public ServiceToken()
+        public ServiceToken(string appId, string appKey)
         {
+            AppId = appId ?? throw new ArgumentNullException(nameof(appId));
+            AppKey = appKey ?? throw new ArgumentNullException(nameof(appKey));
             ExpiredDate = DateTime.Now;
             HttpHelper = new HttpHelper();            
         }
+
+        /// <summary>
+        /// 获取公众号Id。
+        /// </summary>
+        public string AppId { get; private set; }
+
+        /// <summary>
+        /// 获取公众号密钥。
+        /// </summary>
+        public string AppKey { get; private set; }
+
 
         public HttpHelper HttpHelper { get; private set; }
 
@@ -36,16 +51,14 @@ namespace Wodsoft.Wechat
         /// <summary>
         /// 刷新令牌。
         /// </summary>
-        /// <param name="appId">公众号Id。</param>
-        /// <param name="appKey">公众号密钥。</param>
         /// <returns></returns>
-        public virtual async Task RefreshToken(string appId, string appKey)
+        public virtual async Task RefreshTokenAsync()
         {
-            string result = await HttpHelper.GetHttp("https://api.weixin.qq.com/cgi-bin/token", new
+            string result = await HttpHelper.GetHttp(TokenUrl, new
             {
                 grant_type = "client_credential",
-                appid = appId,
-                secret = appKey
+                appid = AppId,
+                secret = AppKey
             });
             if (result.Contains("errcode"))
             {

@@ -25,7 +25,7 @@ namespace Wodsoft.Wechat.MPublic
         /// <param name="appKey">公众号密钥。</param>
         /// <param name="appToken">消息令牌。</param>
         /// <param name="appAESKey">消息AES密钥。</param>
-        public PublicService(ServiceToken serviceToken, string appId, string appKey, string appToken, string appAESKey)
+        public PublicService(IServiceToken serviceToken, string appId, string appKey, string appToken, string appAESKey)
             : this(serviceToken, appId, appKey)
         {
             AppToken = appToken;
@@ -38,7 +38,7 @@ namespace Wodsoft.Wechat.MPublic
         /// <param name="serviceToken">服务令牌。</param>
         /// <param name="appId">公众号Id。</param>
         /// <param name="appKey">公众号密钥。</param>
-        public PublicService(ServiceToken serviceToken, string appId, string appKey)
+        public PublicService(IServiceToken serviceToken, string appId, string appKey)
             : base(serviceToken, appId, appKey)
         {
             MessageManager = new MessageManager();
