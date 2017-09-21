@@ -227,7 +227,6 @@ namespace Wodsoft.Wechat.Payment
         /// 微信APP支付。
         /// </summary>
         /// <param name="order">订单信息。</param>
-        /// <param name="productId">商品Id。</param>
         /// <param name="notifyUrl">回调通知地址。</param>
         /// <returns></returns>
         public virtual async Task<IAppPayment> CreatePayment(IPaymentOrder order, string notifyUrl)
@@ -265,7 +264,7 @@ namespace Wodsoft.Wechat.Payment
                 appId = AppId,
                 timeStamp = payment.TimeStamp,
                 nonceStr = payment.Nonce,
-                partnerid = AppId,
+                partnerid = ShopId,
                 prepayid = payment.PrepayId,
                 package = "Sign=WXPay"
             }, ShopKey);
