@@ -261,7 +261,7 @@ namespace Wodsoft.Wechat.Payment
             payment.Nonce = Guid.NewGuid().ToString().Replace("-", "");
             payment.Signature = GetSignature(new
             {
-                appId = AppId,
+                appid = AppId,
                 timestamp = payment.TimeStamp,
                 noncestr = payment.Nonce,
                 partnerid = ShopId,
