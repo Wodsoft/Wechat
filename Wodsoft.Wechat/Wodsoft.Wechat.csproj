@@ -14,7 +14,7 @@
     <PackageProjectUrl>https://github.com/Wodsoft/Wechat</PackageProjectUrl>
     <PackageTags>微信 Wechat WeiXin</PackageTags>
     <Product>Wodsoft Wechat SDK</Product>
-    <Version>1.0.0-beta-3</Version>
+    <Version>1.0.0-beta-4</Version>
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard1.4|AnyCPU'">

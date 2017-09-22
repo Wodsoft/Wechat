@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.26430.6
+VisualStudioVersion = 15.0.26430.13
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wodsoft.Wechat", "Wodsoft.Wechat\Wodsoft.Wechat.csproj", "{D3F05849-1009-450E-9845-8BEACDB6AEB5}"
 EndProject
@@ -13,6 +13,12 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wodsoft.Wechat.MvcCore", "Wodsoft.Wechat.MvcCore\Wodsoft.Wechat.MvcCore.csproj", "{7DBEF2C2-E70F-49F0-9EB2-50BF5B4FA86E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{56C48F24-9F1C-4B4B-BFB1-15187972738B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{7093A437-E6C8-4B2E-9719-95809A24E9CA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wodsoft.Wechat.UnitTest", "Wodsoft.Wechat.UnitTest\Wodsoft.Wechat.UnitTest.csproj", "{59215891-F948-49FE-B4BD-08ECB5832A03}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -32,8 +38,18 @@ Global
 		{7DBEF2C2-E70F-49F0-9EB2-50BF5B4FA86E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7DBEF2C2-E70F-49F0-9EB2-50BF5B4FA86E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7DBEF2C2-E70F-49F0-9EB2-50BF5B4FA86E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{59215891-F948-49FE-B4BD-08ECB5832A03}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{59215891-F948-49FE-B4BD-08ECB5832A03}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{59215891-F948-49FE-B4BD-08ECB5832A03}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{59215891-F948-49FE-B4BD-08ECB5832A03}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{D3F05849-1009-450E-9845-8BEACDB6AEB5} = {56C48F24-9F1C-4B4B-BFB1-15187972738B}
+		{8D059B27-DE35-4B1A-BC29-C97D2E93C109} = {56C48F24-9F1C-4B4B-BFB1-15187972738B}
+		{7DBEF2C2-E70F-49F0-9EB2-50BF5B4FA86E} = {56C48F24-9F1C-4B4B-BFB1-15187972738B}
+		{59215891-F948-49FE-B4BD-08ECB5832A03} = {7093A437-E6C8-4B2E-9719-95809A24E9CA}
 	EndGlobalSection
 EndGlobal
