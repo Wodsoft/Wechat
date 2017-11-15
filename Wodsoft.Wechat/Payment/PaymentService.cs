@@ -435,10 +435,10 @@ namespace Wodsoft.Wechat.Payment
             payData.Add("appid", AppId);
             payData.Add("mch_id", ShopId);
             payData.Add("nonce_str", Guid.NewGuid().ToString().Replace("-", ""));
-            payData.Add("transactionId", transactionId.TransactionId);
+            payData.Add("transaction_id", transactionId.TransactionId);
             payData.Add("sign", GetSignature(payData, ShopKey));
 
-            string backData = await HttpHelper.PostHttp(new Uri(QueryPayUrl), Encoding.UTF8.GetBytes(GetXml(payData)), "text/xml", Encoding.UTF8);
+            string backData = await HttpHelper.PostHttp(new Uri(RefundQueryUrl), Encoding.UTF8.GetBytes(GetXml(payData)), "text/xml", Encoding.UTF8);
             XElement root = XDocument.Parse(backData).Element("xml");
             if (root.Element("return_code").Value == "FAIL")
             {
@@ -470,7 +470,7 @@ namespace Wodsoft.Wechat.Payment
             payData.Add("out_trade_no", tradeNo.TradeNo);
             payData.Add("sign", GetSignature(payData, ShopKey));
 
-            string backData = await HttpHelper.PostHttp(new Uri(QueryPayUrl), Encoding.UTF8.GetBytes(GetXml(payData)), "text/xml", Encoding.UTF8);
+            string backData = await HttpHelper.PostHttp(new Uri(RefundQueryUrl), Encoding.UTF8.GetBytes(GetXml(payData)), "text/xml", Encoding.UTF8);
             XElement root = XDocument.Parse(backData).Element("xml");
             if (root.Element("return_code").Value == "FAIL")
             {
@@ -502,7 +502,7 @@ namespace Wodsoft.Wechat.Payment
             payData.Add("out_refund_no", refundNo.RefundNo);
             payData.Add("sign", GetSignature(payData, ShopKey));
 
-            string backData = await HttpHelper.PostHttp(new Uri(QueryPayUrl), Encoding.UTF8.GetBytes(GetXml(payData)), "text/xml", Encoding.UTF8);
+            string backData = await HttpHelper.PostHttp(new Uri(RefundQueryUrl), Encoding.UTF8.GetBytes(GetXml(payData)), "text/xml", Encoding.UTF8);
             XElement root = XDocument.Parse(backData).Element("xml");
             if (root.Element("return_code").Value == "FAIL")
             {
@@ -534,7 +534,7 @@ namespace Wodsoft.Wechat.Payment
             payData.Add("refund_id", refundId.RefundId);
             payData.Add("sign", GetSignature(payData, ShopKey));
 
-            string backData = await HttpHelper.PostHttp(new Uri(QueryPayUrl), Encoding.UTF8.GetBytes(GetXml(payData)), "text/xml", Encoding.UTF8);
+            string backData = await HttpHelper.PostHttp(new Uri(RefundQueryUrl), Encoding.UTF8.GetBytes(GetXml(payData)), "text/xml", Encoding.UTF8);
             XElement root = XDocument.Parse(backData).Element("xml");
             if (root.Element("return_code").Value == "FAIL")
             {
@@ -576,15 +576,19 @@ namespace Wodsoft.Wechat.Payment
                     item.Coupon = int.Parse(root.Element("coupon_refund_fee_" + i).Value);
                 if (root.Element("refund_recv_accout_" + i) != null)
                     item.Account = root.Element("refund_recv_accout_" + i).Value;
-                var ncount = int.Parse(root.Element("coupon_refund_count_" + i).Value);
-                item.CouponItems = new Coupon[ncount];
-                for (int n = 0; n < ncount; n++)
+                if (root.Element("coupon_refund_count_" + i) != null)
                 {
-                    Coupon coupon = new Coupon();
-                    coupon.Id = root.Element("coupon_refund_id_" + i + "_" + n).Value;
-                    coupon.Batch = root.Element("coupon_refund_batch_id_" + i + "_" + n).Value;
-                    coupon.Fee = int.Parse(root.Element("coupon_refund_fee_" + i + "_" + n).Value);
+                    var ncount = int.Parse(root.Element("coupon_refund_count_" + i).Value);
+                    item.CouponItems = new Coupon[ncount];
+                    for (int n = 0; n < ncount; n++)
+                    {
+                        Coupon coupon = new Coupon();
+                        coupon.Id = root.Element("coupon_refund_id_" + i + "_" + n).Value;
+                        coupon.Batch = root.Element("coupon_refund_batch_id_" + i + "_" + n).Value;
+                        coupon.Fee = int.Parse(root.Element("coupon_refund_fee_" + i + "_" + n).Value);
+                    }
                 }
+                info.Items[i] = item;
             }
             return info;
         }
