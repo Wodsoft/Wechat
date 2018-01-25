@@ -101,6 +101,11 @@ namespace Wodsoft.Wechat.Payment
         public static string CreatePayUrl = "https://api.mch.weixin.qq.com/pay/unifiedorder";
 
         /// <summary>
+        /// 创建刷卡支付接口地址。
+        /// </summary>
+        public static string CreateMicroPayUrl = "https://api.mch.weixin.qq.com/pay/micropay";
+
+        /// <summary>
         /// 查询支付接口地址。
         /// </summary>
         public static string QueryPayUrl = "https://api.mch.weixin.qq.com/pay/orderquery";
@@ -109,6 +114,11 @@ namespace Wodsoft.Wechat.Payment
         /// 关闭支付接口地址。
         /// </summary>
         public static string ClosePayUrl = "https://api.mch.weixin.qq.com/pay/closeorder";
+
+        /// <summary>
+        /// 撤销支付接口地址。
+        /// </summary>
+        public static string RevokePayUrl = "https://api.mch.weixin.qq.com/secapi/pay/reverse";
 
         /// <summary>
         /// 退款支付接口地址。
@@ -132,6 +142,7 @@ namespace Wodsoft.Wechat.Payment
         /// <param name="openId">用户OpenId。</param>
         /// <param name="notifyUrl">回调通知地址。</param>
         /// <returns></returns>
+        [Obsolete("该方法已过时，请替换为使用CreateJsPayment方法。")]
         public virtual async Task<IJsPayment> CreatePayment(IPaymentOrder order, IOpenId openId, string notifyUrl)
         {
             if (order == null)
@@ -186,7 +197,100 @@ namespace Wodsoft.Wechat.Payment
         /// <param name="productId">商品Id。</param>
         /// <param name="notifyUrl">回调通知地址。</param>
         /// <returns></returns>
-        public virtual async Task<IQrPayment> CreatePayment(IPaymentOrder order, string productId, string notifyUrl)
+        [Obsolete("该方法已过时，请替换为使用CreateQrPayment方法。")]
+        public virtual Task<IQrPayment> CreatePayment(IPaymentOrder order, string productId, string notifyUrl)
+        {
+            return CreateQrPayment(order, productId, notifyUrl);
+        }
+
+        /// <summary>
+        /// 微信APP支付。
+        /// </summary>
+        /// <param name="order">订单信息。</param>
+        /// <param name="notifyUrl">回调通知地址。</param>
+        /// <returns></returns>
+        [Obsolete("该方法已过时，请替换为使用CreateAppPayment方法。")]
+        public virtual Task<IAppPayment> CreatePayment(IPaymentOrder order, string notifyUrl)
+        {
+            return CreateAppPayment(order, notifyUrl);
+        }
+
+        /// <summary>
+        /// 微信内置JsAPI支付。
+        /// </summary>
+        /// <param name="order">订单信息。</param>
+        /// <param name="openId">用户OpenId。</param>
+        /// <param name="notifyUrl">回调通知地址。</param>
+        /// <returns></returns>
+        public virtual Task<IJsPayment> CreateJsPayment(IPaymentOrder order, IOpenId openId, string notifyUrl)
+        {
+            return CreateJsPayment(order, openId.OpenId, notifyUrl);
+        }
+
+        /// <summary>
+        /// 微信内置JsAPI支付。
+        /// </summary>
+        /// <param name="order">订单信息。</param>
+        /// <param name="openId">用户OpenId。</param>
+        /// <param name="notifyUrl">回调通知地址。</param>
+        /// <returns></returns>
+        public virtual async Task<IJsPayment> CreateJsPayment(IPaymentOrder order, string openId, string notifyUrl)
+        {
+            if (order == null)
+                throw new ArgumentNullException("order");
+            if (openId == null)
+                throw new ArgumentNullException("openId");
+            if (notifyUrl == null)
+                throw new ArgumentNullException("notifyUrl");
+            if (notifyUrl == null)
+                throw new ArgumentNullException("notifyUrl");
+            ValidateOrderInfo(order);
+            var payData = OrderInfoToDictionary(order);
+            payData.Add("trade_type", "JSAPI");
+            payData.Add("openid", openId);
+            payData.Add("appid", AppId);//公众账号ID
+            payData.Add("mch_id", ShopId);//商户号
+            payData.Add("nonce_str", Guid.NewGuid().ToString().Replace("-", ""));//随机字符串
+            payData.Add("notify_url", notifyUrl);
+            payData.Add("sign", GetSignature(payData, ShopKey));
+
+            string backData = await HttpHelper.PostHttp(new Uri(CreatePayUrl), Encoding.UTF8.GetBytes(GetXml(payData)), "text/xml", Encoding.UTF8);
+            XElement root = XDocument.Parse(backData).Element("xml");
+            if (root.Element("return_code").Value == "FAIL")
+            {
+                string errMsg = root.Element("return_msg").Value;
+                throw new WechatException(errMsg);
+            }
+            if (root.Element("result_code").Value == "FAIL")
+            {
+                string errMsg = root.Element("err_code").Value;
+                throw new WechatException(errMsg);
+            }
+            JsPayment payment = new JsPayment();
+            payment.PrepayId = root.Element("prepay_id").Value;
+            payment.Nonce = Guid.NewGuid().ToString().Replace("-", "");
+            payment.TradeType = root.Element("trade_type").Value;
+            payment.TimeStamp = GetTimestamp();
+            payment.Signature = GetSignature(new
+            {
+                appId = AppId,
+                timeStamp = payment.TimeStamp,
+                nonceStr = payment.Nonce,
+                package = "prepay_id=" + payment.PrepayId,
+                signType = "MD5"
+            }, ShopKey);
+
+            return payment;
+        }
+
+        /// <summary>
+        /// 微信二维码扫码支付。
+        /// </summary>
+        /// <param name="order">订单信息。</param>
+        /// <param name="productId">商品Id。</param>
+        /// <param name="notifyUrl">回调通知地址。</param>
+        /// <returns></returns>
+        public virtual async Task<IQrPayment> CreateQrPayment(IPaymentOrder order, string productId, string notifyUrl)
         {
             if (order == null)
                 throw new ArgumentNullException("order");
@@ -194,6 +298,8 @@ namespace Wodsoft.Wechat.Payment
                 throw new ArgumentNullException("productId");
             if (productId.Length > 32)
                 throw new ArgumentOutOfRangeException("productId长度不能大于32。");
+            if (notifyUrl == null)
+                throw new ArgumentNullException("notifyUrl");
             ValidateOrderInfo(order);
             var payData = OrderInfoToDictionary(order);
             payData.Add("trade_type", "NATIVE");
@@ -229,10 +335,12 @@ namespace Wodsoft.Wechat.Payment
         /// <param name="order">订单信息。</param>
         /// <param name="notifyUrl">回调通知地址。</param>
         /// <returns></returns>
-        public virtual async Task<IAppPayment> CreatePayment(IPaymentOrder order, string notifyUrl)
+        public virtual async Task<IAppPayment> CreateAppPayment(IPaymentOrder order, string notifyUrl)
         {
             if (order == null)
                 throw new ArgumentNullException("order");
+            if (notifyUrl == null)
+                throw new ArgumentNullException("notifyUrl");
             ValidateOrderInfo(order);
             var payData = OrderInfoToDictionary(order);
             payData.Add("trade_type", "APP");
@@ -268,6 +376,58 @@ namespace Wodsoft.Wechat.Payment
                 prepayid = payment.PrepayId,
                 package = "Sign=WXPay"
             }, ShopKey);
+            return payment;
+        }
+
+        /// <summary>
+        /// 微信刷卡支付。
+        /// </summary>
+        /// <param name="order">订单信息。</param>
+        /// <param name="authCode">授权码。（用户支付条形码、二维码内容。）</param>
+        /// <param name="notifyUrl">回调地址。</param>
+        /// <returns></returns>
+        public virtual async Task<IMicroPayment> CreateMicroPayment(IPaymentOrder order, string authCode)
+        {
+            if (order == null)
+                throw new ArgumentNullException("order");
+            if (authCode == null)
+                throw new ArgumentNullException("authCode");
+            ValidateOrderInfo(order);
+            var payData = OrderInfoToDictionary(order);
+            payData.Add("appid", AppId);//公众账号ID
+            payData.Add("mch_id", ShopId);//商户号
+            payData.Add("nonce_str", Guid.NewGuid().ToString().Replace("-", ""));//随机字符串
+            payData.Add("auth_code", authCode);
+            payData.Add("sign", GetSignature(payData, ShopKey));
+
+            string backData = await HttpHelper.PostHttp(new Uri(CreateMicroPayUrl), Encoding.UTF8.GetBytes(GetXml(payData)), "text/xml", Encoding.UTF8);
+            XElement root = XDocument.Parse(backData).Element("xml");
+            if (root.Element("return_code").Value == "FAIL")
+            {
+                string errMsg = root.Element("return_msg").Value;
+                throw new WechatException(errMsg);
+            }
+            if (root.Element("result_code").Value == "FAIL")
+            {
+                switch (root.Element("err_code").Value)
+                {
+                    case "AUTHCODEEXPIRE":
+                    case "NOTENOUGH":
+                        return new MicroPayment { State = TradeState.PAYERROR, Message = root.Element("err_code_des").Value };
+                    case "USERPAYING":
+                        return new MicroPayment { State = TradeState.USERPAYING, Message = "用户支付中" };
+                    default:
+                        string errMsg = root.Element("err_code").Value;
+                        throw new WechatException(errMsg);
+                }
+            }
+            MicroPayment payment = new MicroPayment
+            {
+                State = TradeState.SUCCESS,
+                TransactionId = root.Element("transaction_id").Value,
+                TradeNo = order.TradeNo,
+                Message = "支付成功"
+            };
             return payment;
         }
 
@@ -367,7 +527,7 @@ namespace Wodsoft.Wechat.Payment
             }
             return true;
         }
-
+        
         /// <summary>
         /// 微信交易退款。
         /// </summary>
