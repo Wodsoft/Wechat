@@ -527,7 +527,40 @@ namespace Wodsoft.Wechat.Payment
             }
             return true;
         }
-        
+
+        /// <summary>
+        /// 撤销刷卡支付交易。
+        /// </summary>
+        /// <param name="tradeNo"></param>
+        /// <returns></returns>
+        public virtual async Task<bool> RevokePayment(ITradeNumber tradeNo)
+        {
+            if (tradeNo == null)
+                throw new ArgumentNullException("tradeNo");
+            if (!IsCertificateEnabled)
+                throw new NotSupportedException("不支持没有证书的操作。");
+            var payData = new Dictionary<string, string>();
+            payData.Add("appid", AppId);
+            payData.Add("mch_id", ShopId);
+            payData.Add("nonce_str", Guid.NewGuid().ToString().Replace("-", ""));//随机字符串
+            payData.Add("out_trade_no", tradeNo.TradeNo);
+            payData.Add("sign", GetSignature(payData, ShopKey));
+
+            string backData = await HttpHelper.PostHttp(new Uri(RevokePayUrl), Encoding.UTF8.GetBytes(GetXml(payData)), "text/xml", Encoding.UTF8);
+            XElement root = XDocument.Parse(backData).Element("xml");
+            if (root.Element("return_code").Value == "FAIL")
+            {
+                string errMsg = root.Element("return_msg").Value;
+                throw new WechatException(errMsg);
+            }
+            if (root.Element("result_code").Value == "FAIL")
+            {
+                string errMsg = root.Element("err_code").Value;
+                throw new WechatException(errMsg);
+            }
+            return true;
+        }
+
         /// <summary>
         /// 微信交易退款。
         /// </summary>
