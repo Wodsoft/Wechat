@@ -170,7 +170,7 @@ namespace Wodsoft.Wechat.Payment
             }
             if (root.Element("result_code").Value == "FAIL")
             {
-                string errMsg = root.Element("err_code").Value;
+                string errMsg = root.Element("err_code_des").Value;
                 throw new WechatException(errMsg);
             }
             JsPayment payment = new JsPayment();
@@ -263,7 +263,7 @@ namespace Wodsoft.Wechat.Payment
             }
             if (root.Element("result_code").Value == "FAIL")
             {
-                string errMsg = root.Element("err_code").Value;
+                string errMsg = root.Element("err_code_des").Value;
                 throw new WechatException(errMsg);
             }
             JsPayment payment = new JsPayment();
@@ -319,7 +319,7 @@ namespace Wodsoft.Wechat.Payment
             }
             if (root.Element("result_code").Value == "FAIL")
             {
-                string errMsg = root.Element("err_code").Value;
+                string errMsg = root.Element("err_code_des").Value;
                 throw new WechatException(errMsg);
             }
             QrPayment payment = new QrPayment();
@@ -359,7 +359,7 @@ namespace Wodsoft.Wechat.Payment
             }
             if (root.Element("result_code").Value == "FAIL")
             {
-                string errMsg = root.Element("err_code").Value;
+                string errMsg = root.Element("err_code_des").Value;
                 throw new WechatException(errMsg);
             }
             AppPayment payment = new AppPayment();
@@ -417,7 +417,7 @@ namespace Wodsoft.Wechat.Payment
                     case "USERPAYING":
                         return new MicroPayment { State = TradeState.USERPAYING, Message = "用户支付中" };
                     default:
-                        string errMsg = root.Element("err_code").Value;
+                        string errMsg = root.Element("err_code_des").Value;
                         throw new WechatException(errMsg);
                 }
             }
@@ -456,7 +456,7 @@ namespace Wodsoft.Wechat.Payment
             }
             if (root.Element("result_code").Value == "FAIL")
             {
-                string errMsg = root.Element("err_code").Value;
+                string errMsg = root.Element("err_code_des").Value;
                 throw new WechatException(errMsg);
             }
             IPaymentInfo info = GetPaymentInfo(root);
@@ -490,7 +490,7 @@ namespace Wodsoft.Wechat.Payment
             }
             if (root.Element("result_code").Value == "FAIL")
             {
-                string errMsg = root.Element("err_code").Value;
+                string errMsg = root.Element("err_code_des").Value;
                 throw new WechatException(errMsg);
             }
             IPaymentInfo info = GetPaymentInfo(root);
@@ -522,7 +522,7 @@ namespace Wodsoft.Wechat.Payment
             }
             if (root.Element("result_code").Value == "FAIL")
             {
-                string errMsg = root.Element("err_code").Value;
+                string errMsg = root.Element("err_code_des").Value;
                 throw new WechatException(errMsg);
             }
             return true;
@@ -555,7 +555,7 @@ namespace Wodsoft.Wechat.Payment
             }
             if (root.Element("result_code").Value == "FAIL")
             {
-                string errMsg = root.Element("err_code").Value;
+                string errMsg = root.Element("err_code_des").Value;
                 throw new WechatException(errMsg);
             }
             return true;
@@ -598,7 +598,7 @@ namespace Wodsoft.Wechat.Payment
             }
             if (root.Element("result_code").Value == "FAIL")
             {
-                string errMsg = root.Element("err_code").Value;
+                string errMsg = root.Element("err_code_des").Value;
                 throw new WechatException(errMsg);
             }
 
@@ -640,7 +640,7 @@ namespace Wodsoft.Wechat.Payment
             }
             if (root.Element("result_code").Value == "FAIL")
             {
-                string errMsg = root.Element("err_code").Value;
+                string errMsg = root.Element("err_code_des").Value;
                 throw new WechatException(errMsg);
             }
             IRefundInfo info = GetRefundInfo(root);
@@ -672,7 +672,7 @@ namespace Wodsoft.Wechat.Payment
             }
             if (root.Element("result_code").Value == "FAIL")
             {
-                string errMsg = root.Element("err_code").Value;
+                string errMsg = root.Element("err_code_des").Value;
                 throw new WechatException(errMsg);
             }
             IRefundInfo info = GetRefundInfo(root);
@@ -704,7 +704,7 @@ namespace Wodsoft.Wechat.Payment
             }
             if (root.Element("result_code").Value == "FAIL")
             {
-                string errMsg = root.Element("err_code").Value;
+                string errMsg = root.Element("err_code_des").Value;
                 throw new WechatException(errMsg);
             }
             IRefundInfo info = GetRefundInfo(root);
@@ -736,7 +736,7 @@ namespace Wodsoft.Wechat.Payment
             }
             if (root.Element("result_code").Value == "FAIL")
             {
-                string errMsg = root.Element("err_code").Value;
+                string errMsg = root.Element("err_code_des").Value;
                 throw new WechatException(errMsg);
             }
             IRefundInfo info = GetRefundInfo(root);
@@ -828,7 +828,7 @@ namespace Wodsoft.Wechat.Payment
             }
             if (root.Element("result_code").Value == "FAIL")
             {
-                string errMsg = root.Element("err_code").Value;
+                string errMsg = root.Element("err_code_des").Value;
                 throw new WechatException(errMsg);
             }
             return GetPaymentInfo(root);
