@@ -21,9 +21,11 @@ namespace Wodsoft.Wechat
 #if NET451
             Handler = new WebRequestHandler();
 #else
-        Handler = new HttpClientHandler();
+            Handler = new HttpClientHandler();
+            Handler.MaxConnectionsPerServer = 512;            
 #endif
             Client = new HttpClient(Handler);
+            Client.Timeout = TimeSpan.FromSeconds(15);
         }
 
         public HttpClient Client { get; private set; }
@@ -240,7 +242,7 @@ namespace Wodsoft.Wechat
                 return result;
             }
         }
-        
+
         /// <summary>
         /// 
         /// </summary>

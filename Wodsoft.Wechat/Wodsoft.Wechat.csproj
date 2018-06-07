@@ -6,7 +6,7 @@
     <SccLocalPath>SAK</SccLocalPath>
   </PropertyGroup>
   <PropertyGroup>
-    <TargetFrameworks>netstandard1.4;net451</TargetFrameworks>
+    <TargetFrameworks>netstandard1.4;net451;netstandard2.0</TargetFrameworks>
     <RootNamespace>Wodsoft.Wechat</RootNamespace>
     <Description>微信SDK，公众服务，支付服务</Description>
     <Company>Wodsoft</Company>
@@ -14,13 +14,15 @@
     <PackageProjectUrl>https://github.com/Wodsoft/Wechat</PackageProjectUrl>
     <PackageTags>微信 Wechat WeiXin</PackageTags>
     <Product>Wodsoft Wechat SDK</Product>
-    <Version>1.0.0-beta-6</Version>
+    <Version>1.0.0-beta-7</Version>
     <GeneratePackageOnBuild>False</GeneratePackageOnBuild>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|netstandard1.4|AnyCPU'">
-    <DocumentationFile>bin\Debug\netstandard1.4\Wodsoft.Wechat.xml</DocumentationFile>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard1.4'">
+    <PackageReference Include="System.Reflection.TypeExtensions" Version="4.3.0" />
+    <PackageReference Include="System.ComponentModel.Annotations" Version="4.3.0" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
     <PackageReference Include="System.Reflection.TypeExtensions" Version="4.3.0" />
     <PackageReference Include="System.ComponentModel.Annotations" Version="4.3.0" />
   </ItemGroup>
