@@ -76,9 +76,59 @@ namespace Wodsoft.Wechat.Payment
         { }
 
         /// <summary>
+        /// 实例化微信服务商支付服务。
+        /// </summary>
+        /// <param name="serviceToken">微信服务令牌。</param>
+        /// <param name="appId">公众号Id。</param>
+        /// <param name="appKey">公众号密钥。</param>
+        /// <param name="shopId">商户号。</param>
+        /// <param name="shopKey">商户密钥。</param>
+        /// <param name="subShopId">子商户号。</param>
+        public PaymentService(IServiceToken serviceToken, string appId, string appKey, string shopId, string shopKey, string subShopId) : this(serviceToken, appId, appKey, shopId, shopKey)
+        {
+            SubShopId = subShopId ?? throw new ArgumentNullException(nameof(subShopId));
+        }
+
+        /// <summary>
+        /// 实例化微信支付服务。
+        /// </summary>
+        /// <param name="serviceToken">微信服务令牌。</param>
+        /// <param name="appId">公众号Id。</param>
+        /// <param name="appKey">公众号密钥。</param>
+        /// <param name="shopId">商户号。</param>
+        /// <param name="shopKey">商户密钥。</param>
+        /// <param name="subShopId">子商户号。</param>
+        /// <param name="cert">客户端证书。</param>
+        public PaymentService(IServiceToken serviceToken, string appId, string appKey, string shopId, string shopKey, string subShopId, X509Certificate2 cert)
+            : this(serviceToken, appId, appKey, shopId, shopKey, cert)
+        {
+            SubShopId = subShopId ?? throw new ArgumentNullException(nameof(subShopId));
+        }
+
+        /// <summary>
+        /// 实例化微信支付服务。
+        /// </summary>
+        /// <param name="serviceToken">微信服务令牌。</param>
+        /// <param name="appId">公众号Id。</param>
+        /// <param name="appKey">公众号密钥。</param>
+        /// <param name="shopId">商户号。</param>
+        /// <param name="shopKey">商户密钥。</param>
+        /// <param name="subShopId">子商户号。</param>
+        /// <param name="certPath">客户端证书路径。</param>
+        /// <param name="certPassword">客户端证书密码。</param>
+        public PaymentService(IServiceToken serviceToken, string appId, string appKey, string shopId, string shopKey, string subShopId, string certPath, string certPassword)
+            : this(serviceToken, appId, appKey, shopId, shopKey, subShopId, new X509Certificate2(certPath, certPassword))
+        { }
+
+        /// <summary>
         /// 获取商户号。
         /// </summary>
         public string ShopId { get; private set; }
+
+        /// <summary>
+        /// 获取子商户号。
+        /// </summary>
+        public string SubShopId { get; private set; }
 
         /// <summary>
         /// 获取商户密钥。
@@ -157,6 +207,8 @@ namespace Wodsoft.Wechat.Payment
             payData.Add("openid", openId.OpenId);
             payData.Add("appid", AppId);//公众账号ID
             payData.Add("mch_id", ShopId);//商户号
+            if (SubShopId != null)
+                payData["sub_mch_id"] = SubShopId;
             payData.Add("nonce_str", Guid.NewGuid().ToString().Replace("-", ""));//随机字符串
             payData.Add("notify_url", notifyUrl);
             payData.Add("sign", GetSignature(payData, ShopKey));
@@ -250,6 +302,8 @@ namespace Wodsoft.Wechat.Payment
             payData.Add("openid", openId);
             payData.Add("appid", AppId);//公众账号ID
             payData.Add("mch_id", ShopId);//商户号
+            if (SubShopId != null)
+                payData["sub_mch_id"] = SubShopId;
             payData.Add("nonce_str", Guid.NewGuid().ToString().Replace("-", ""));//随机字符串
             payData.Add("notify_url", notifyUrl);
             payData.Add("sign", GetSignature(payData, ShopKey));
@@ -306,6 +360,8 @@ namespace Wodsoft.Wechat.Payment
             payData.Add("product_id", productId);
             payData.Add("appid", AppId);//公众账号ID
             payData.Add("mch_id", ShopId);//商户号
+            if (SubShopId != null)
+                payData["sub_mch_id"] = SubShopId;
             payData.Add("nonce_str", Guid.NewGuid().ToString().Replace("-", ""));//随机字符串
             payData.Add("notify_url", notifyUrl);
             payData.Add("sign", GetSignature(payData, ShopKey));
@@ -346,6 +402,8 @@ namespace Wodsoft.Wechat.Payment
             payData.Add("trade_type", "APP");
             payData.Add("appid", AppId);//公众账号ID
             payData.Add("mch_id", ShopId);//商户号
+            if (SubShopId != null)
+                payData["sub_mch_id"] = SubShopId;
             payData.Add("nonce_str", Guid.NewGuid().ToString().Replace("-", ""));//随机字符串
             payData.Add("notify_url", notifyUrl);
             payData.Add("sign", GetSignature(payData, ShopKey));
@@ -396,6 +454,8 @@ namespace Wodsoft.Wechat.Payment
             var payData = OrderInfoToDictionary(order);
             payData.Add("appid", AppId);//公众账号ID
             payData.Add("mch_id", ShopId);//商户号
+            if (SubShopId != null)
+                payData["sub_mch_id"] = SubShopId;
             payData.Add("nonce_str", Guid.NewGuid().ToString().Replace("-", ""));//随机字符串
             payData.Add("auth_code", authCode);
             payData.Add("sign", GetSignature(payData, ShopKey));
@@ -443,6 +503,8 @@ namespace Wodsoft.Wechat.Payment
             var payData = new Dictionary<string, string>();
             payData.Add("appid", AppId);
             payData.Add("mch_id", ShopId);
+            if (SubShopId != null)
+                payData["sub_mch_id"] = SubShopId;
             payData.Add("nonce_str", Guid.NewGuid().ToString().Replace("-", ""));//随机字符串
             payData.Add("out_trade_no", tradeNo.TradeNo);
             payData.Add("sign", GetSignature(payData, ShopKey));
@@ -475,6 +537,8 @@ namespace Wodsoft.Wechat.Payment
             var payData = new Dictionary<string, string>();
             payData.Add("appid", AppId);
             payData.Add("mch_id", ShopId);
+            if (SubShopId != null)
+                payData["sub_mch_id"] = SubShopId;
             payData.Add("nonce_str", Guid.NewGuid().ToString().Replace("-", ""));//随机字符串
             payData.Add("transactionId", transactionId.TransactionId);
             payData.Add("sign", GetSignature(payData, ShopKey));
@@ -509,6 +573,8 @@ namespace Wodsoft.Wechat.Payment
             var payData = new Dictionary<string, string>();
             payData.Add("appid", AppId);
             payData.Add("mch_id", ShopId);
+            if (SubShopId != null)
+                payData["sub_mch_id"] = SubShopId;
             payData.Add("nonce_str", Guid.NewGuid().ToString().Replace("-", ""));//随机字符串
             payData.Add("out_trade_no", tradeNo.TradeNo);
             payData.Add("sign", GetSignature(payData, ShopKey));
@@ -542,6 +608,8 @@ namespace Wodsoft.Wechat.Payment
             var payData = new Dictionary<string, string>();
             payData.Add("appid", AppId);
             payData.Add("mch_id", ShopId);
+            if (SubShopId != null)
+                payData["sub_mch_id"] = SubShopId;
             payData.Add("nonce_str", Guid.NewGuid().ToString().Replace("-", ""));//随机字符串
             payData.Add("out_trade_no", tradeNo.TradeNo);
             payData.Add("sign", GetSignature(payData, ShopKey));
@@ -575,6 +643,8 @@ namespace Wodsoft.Wechat.Payment
             var payData = new Dictionary<string, string>();
             payData.Add("appid", AppId);
             payData.Add("mch_id", ShopId);
+            if (SubShopId != null)
+                payData["sub_mch_id"] = SubShopId;
             payData.Add("nonce_str", Guid.NewGuid().ToString().Replace("-", ""));//随机字符串
             if (refundInfo.TransactionId != null)
                 payData.Add("transaction_id", refundInfo.TransactionId);
@@ -627,6 +697,8 @@ namespace Wodsoft.Wechat.Payment
             var payData = new Dictionary<string, string>();
             payData.Add("appid", AppId);
             payData.Add("mch_id", ShopId);
+            if (SubShopId != null)
+                payData["sub_mch_id"] = SubShopId;
             payData.Add("nonce_str", Guid.NewGuid().ToString().Replace("-", ""));
             payData.Add("transaction_id", transactionId.TransactionId);
             payData.Add("sign", GetSignature(payData, ShopKey));
@@ -659,6 +731,8 @@ namespace Wodsoft.Wechat.Payment
             var payData = new Dictionary<string, string>();
             payData.Add("appid", AppId);
             payData.Add("mch_id", ShopId);
+            if (SubShopId != null)
+                payData["sub_mch_id"] = SubShopId;
             payData.Add("nonce_str", Guid.NewGuid().ToString().Replace("-", ""));
             payData.Add("out_trade_no", tradeNo.TradeNo);
             payData.Add("sign", GetSignature(payData, ShopKey));
@@ -691,6 +765,8 @@ namespace Wodsoft.Wechat.Payment
             var payData = new Dictionary<string, string>();
             payData.Add("appid", AppId);
             payData.Add("mch_id", ShopId);
+            if (SubShopId != null)
+                payData["sub_mch_id"] = SubShopId;
             payData.Add("nonce_str", Guid.NewGuid().ToString().Replace("-", ""));
             payData.Add("out_refund_no", refundNo.RefundNo);
             payData.Add("sign", GetSignature(payData, ShopKey));
@@ -723,6 +799,8 @@ namespace Wodsoft.Wechat.Payment
             var payData = new Dictionary<string, string>();
             payData.Add("appid", AppId);
             payData.Add("mch_id", ShopId);
+            if (SubShopId != null)
+                payData["sub_mch_id"] = SubShopId;
             payData.Add("nonce_str", Guid.NewGuid().ToString().Replace("-", ""));
             payData.Add("refund_id", refundId.RefundId);
             payData.Add("sign", GetSignature(payData, ShopKey));
@@ -796,6 +874,8 @@ namespace Wodsoft.Wechat.Payment
             var data = new Dictionary<string, string>();
             data.Add("appid", AppId);//公众账号ID
             data.Add("mch_id", ShopId);//商户号
+            if (SubShopId != null)
+                data["sub_mch_id"] = SubShopId;
             data.Add("nonce_str", Guid.NewGuid().ToString().Replace("-", ""));//随机字符串
             data.Add("bill_date", date.ToString("yyyyMMdd"));
             data.Add("bill_type", "ALL");
