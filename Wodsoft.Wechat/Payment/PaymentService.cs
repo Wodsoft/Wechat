@@ -213,7 +213,9 @@ namespace Wodsoft.Wechat.Payment
             payData.Add("notify_url", notifyUrl);
             payData.Add("sign", GetSignature(payData, ShopKey));
 
-            string backData = await HttpHelper.PostHttp(new Uri(CreatePayUrl), Encoding.UTF8.GetBytes(GetXml(payData)), "text/xml", Encoding.UTF8);
+            var content = GetXml(payData);
+            File.WriteAllText("C:\\Logs\\Wechat" + DateTime.Now.ToString("yyyyMMddHHmmssfff") + ".log", content, Encoding.UTF8);
+            string backData = await HttpHelper.PostHttp(new Uri(CreatePayUrl), Encoding.UTF8.GetBytes(content), "text/xml", Encoding.UTF8);
             XElement root = XDocument.Parse(backData).Element("xml");
             if (root.Element("return_code").Value == "FAIL")
             {
@@ -308,7 +310,9 @@ namespace Wodsoft.Wechat.Payment
             payData.Add("notify_url", notifyUrl);
             payData.Add("sign", GetSignature(payData, ShopKey));
 
-            string backData = await HttpHelper.PostHttp(new Uri(CreatePayUrl), Encoding.UTF8.GetBytes(GetXml(payData)), "text/xml", Encoding.UTF8);
+            var content = GetXml(payData);
+            File.WriteAllText("C:\\Logs\\Wechat" + DateTime.Now.ToString("yyyyMMddHHmmssfff") + ".log", content, Encoding.UTF8);
+            string backData = await HttpHelper.PostHttp(new Uri(CreatePayUrl), Encoding.UTF8.GetBytes(content), "text/xml", Encoding.UTF8);
             XElement root = XDocument.Parse(backData).Element("xml");
             if (root.Element("return_code").Value == "FAIL")
             {
@@ -366,7 +370,9 @@ namespace Wodsoft.Wechat.Payment
             payData.Add("notify_url", notifyUrl);
             payData.Add("sign", GetSignature(payData, ShopKey));
 
-            string backData = await HttpHelper.PostHttp(new Uri(CreatePayUrl), Encoding.UTF8.GetBytes(GetXml(payData)), "text/xml", Encoding.UTF8);
+            var content = GetXml(payData);
+            File.WriteAllText("C:\\Logs\\Wechat" + DateTime.Now.ToString("yyyyMMddHHmmssfff") + ".log", content, Encoding.UTF8);
+            string backData = await HttpHelper.PostHttp(new Uri(CreatePayUrl), Encoding.UTF8.GetBytes(content), "text/xml", Encoding.UTF8);
             XElement root = XDocument.Parse(backData).Element("xml");
             if (root.Element("return_code").Value == "FAIL")
             {
@@ -382,6 +388,50 @@ namespace Wodsoft.Wechat.Payment
             payment.PrepayId = root.Element("prepay_id").Value;
             payment.TradeType = root.Element("trade_type").Value;
             payment.QrUrl = root.Element("code_url").Value;
+            return payment;
+        }
+
+        /// <summary>
+        /// 微信H5支付。
+        /// </summary>
+        /// <param name="order">订单信息。</param>
+        /// <param name="notifyUrl">回调通知地址。</param>
+        /// <returns></returns>
+        public virtual async Task<IH5Payment> CreateH5Payment(IPaymentOrder order, string notifyUrl)
+        {
+            if (order == null)
+                throw new ArgumentNullException("order");
+            if (notifyUrl == null)
+                throw new ArgumentNullException("notifyUrl");
+            ValidateOrderInfo(order);
+            var payData = OrderInfoToDictionary(order);
+            payData.Add("trade_type", "NATIVE");
+            payData.Add("appid", AppId);//公众账号ID
+            payData.Add("mch_id", ShopId);//商户号
+            if (SubShopId != null)
+                payData["sub_mch_id"] = SubShopId;
+            payData.Add("nonce_str", Guid.NewGuid().ToString().Replace("-", ""));//随机字符串
+            payData.Add("notify_url", notifyUrl);
+            payData.Add("sign", GetSignature(payData, ShopKey));
+
+            var content = GetXml(payData);
+            File.WriteAllText("C:\\Logs\\Wechat" + DateTime.Now.ToString("yyyyMMddHHmmssfff") + ".log", content, Encoding.UTF8);
+            string backData = await HttpHelper.PostHttp(new Uri(CreatePayUrl), Encoding.UTF8.GetBytes(content), "text/xml", Encoding.UTF8);
+            XElement root = XDocument.Parse(backData).Element("xml");
+            if (root.Element("return_code").Value == "FAIL")
+            {
+                string errMsg = root.Element("return_msg").Value;
+                throw new WechatException(errMsg);
+            }
+            if (root.Element("result_code").Value == "FAIL")
+            {
+                string errMsg = root.Element("err_code_des").Value;
+                throw new WechatException(errMsg);
+            }
+            H5Payment payment = new H5Payment();
+            payment.PrepayId = root.Element("prepay_id").Value;
+            payment.TradeType = root.Element("trade_type").Value;
+            payment.RedirectUrl = root.Element("mweb_url").Value;
             return payment;
         }
 
@@ -408,7 +458,9 @@ namespace Wodsoft.Wechat.Payment
             payData.Add("notify_url", notifyUrl);
             payData.Add("sign", GetSignature(payData, ShopKey));
 
-            string backData = await HttpHelper.PostHttp(new Uri(CreatePayUrl), Encoding.UTF8.GetBytes(GetXml(payData)), "text/xml", Encoding.UTF8);
+            var content = GetXml(payData);
+            File.WriteAllText("C:\\Logs\\Wechat" + DateTime.Now.ToString("yyyyMMddHHmmssfff") + ".log", content, Encoding.UTF8);
+            string backData = await HttpHelper.PostHttp(new Uri(CreatePayUrl), Encoding.UTF8.GetBytes(content), "text/xml", Encoding.UTF8);
             XElement root = XDocument.Parse(backData).Element("xml");
             if (root.Element("return_code").Value == "FAIL")
             {
@@ -460,7 +512,9 @@ namespace Wodsoft.Wechat.Payment
             payData.Add("auth_code", authCode);
             payData.Add("sign", GetSignature(payData, ShopKey));
 
-            string backData = await HttpHelper.PostHttp(new Uri(CreateMicroPayUrl), Encoding.UTF8.GetBytes(GetXml(payData)), "text/xml", Encoding.UTF8);
+            var content = GetXml(payData);
+            File.WriteAllText("C:\\Logs\\Wechat" + DateTime.Now.ToString("yyyyMMddHHmmssfff") + ".log", content, Encoding.UTF8);
+            string backData = await HttpHelper.PostHttp(new Uri(CreateMicroPayUrl), Encoding.UTF8.GetBytes(content), "text/xml", Encoding.UTF8);
             XElement root = XDocument.Parse(backData).Element("xml");
             if (root.Element("return_code").Value == "FAIL")
             {
