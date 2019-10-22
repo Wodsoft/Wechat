@@ -311,7 +311,6 @@ namespace Wodsoft.Wechat.Payment
             payData.Add("sign", GetSignature(payData, ShopKey));
 
             var content = GetXml(payData);
-            File.WriteAllText("C:\\Logs\\Wechat" + DateTime.Now.ToString("yyyyMMddHHmmssfff") + ".log", content, Encoding.UTF8);
             string backData = await HttpHelper.PostHttp(new Uri(CreatePayUrl), Encoding.UTF8.GetBytes(content), "text/xml", Encoding.UTF8);
             XElement root = XDocument.Parse(backData).Element("xml");
             if (root.Element("return_code").Value == "FAIL")
@@ -371,7 +370,6 @@ namespace Wodsoft.Wechat.Payment
             payData.Add("sign", GetSignature(payData, ShopKey));
 
             var content = GetXml(payData);
-            File.WriteAllText("C:\\Logs\\Wechat" + DateTime.Now.ToString("yyyyMMddHHmmssfff") + ".log", content, Encoding.UTF8);
             string backData = await HttpHelper.PostHttp(new Uri(CreatePayUrl), Encoding.UTF8.GetBytes(content), "text/xml", Encoding.UTF8);
             XElement root = XDocument.Parse(backData).Element("xml");
             if (root.Element("return_code").Value == "FAIL")
@@ -405,7 +403,7 @@ namespace Wodsoft.Wechat.Payment
                 throw new ArgumentNullException("notifyUrl");
             ValidateOrderInfo(order);
             var payData = OrderInfoToDictionary(order);
-            payData.Add("trade_type", "NATIVE");
+            payData.Add("trade_type", "MWEB");
             payData.Add("appid", AppId);//公众账号ID
             payData.Add("mch_id", ShopId);//商户号
             if (SubShopId != null)
@@ -415,7 +413,6 @@ namespace Wodsoft.Wechat.Payment
             payData.Add("sign", GetSignature(payData, ShopKey));
 
             var content = GetXml(payData);
-            File.WriteAllText("C:\\Logs\\Wechat" + DateTime.Now.ToString("yyyyMMddHHmmssfff") + ".log", content, Encoding.UTF8);
             string backData = await HttpHelper.PostHttp(new Uri(CreatePayUrl), Encoding.UTF8.GetBytes(content), "text/xml", Encoding.UTF8);
             XElement root = XDocument.Parse(backData).Element("xml");
             if (root.Element("return_code").Value == "FAIL")
@@ -459,7 +456,6 @@ namespace Wodsoft.Wechat.Payment
             payData.Add("sign", GetSignature(payData, ShopKey));
 
             var content = GetXml(payData);
-            File.WriteAllText("C:\\Logs\\Wechat" + DateTime.Now.ToString("yyyyMMddHHmmssfff") + ".log", content, Encoding.UTF8);
             string backData = await HttpHelper.PostHttp(new Uri(CreatePayUrl), Encoding.UTF8.GetBytes(content), "text/xml", Encoding.UTF8);
             XElement root = XDocument.Parse(backData).Element("xml");
             if (root.Element("return_code").Value == "FAIL")
@@ -513,7 +509,6 @@ namespace Wodsoft.Wechat.Payment
             payData.Add("sign", GetSignature(payData, ShopKey));
 
             var content = GetXml(payData);
-            File.WriteAllText("C:\\Logs\\Wechat" + DateTime.Now.ToString("yyyyMMddHHmmssfff") + ".log", content, Encoding.UTF8);
             string backData = await HttpHelper.PostHttp(new Uri(CreateMicroPayUrl), Encoding.UTF8.GetBytes(content), "text/xml", Encoding.UTF8);
             XElement root = XDocument.Parse(backData).Element("xml");
             if (root.Element("return_code").Value == "FAIL")
